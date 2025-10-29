@@ -252,17 +252,20 @@ class Dashboard {
     }
 
     handleRevenueSubmit() {
+    try {
         const formData = new FormData(document.getElementById('revenueForm'));
+        const revenueId = document.getElementById('revenueId').value;
+        
         const revenue = {
-            id: document.getElementById('revenueId').value || Date.now().toString(),
-            description: formData.get('revenueDescription'),
-            amount: parseFloat(formData.get('revenueAmount')),
-            date: formData.get('revenueDate'),
-            type: formData.get('revenueType'),
-            category: formData.get('revenueCategory') || 'Outros'
+            id: revenueId || Date.now().toString(),
+            description: document.getElementById('revenueDescription').value,
+            amount: parseFloat(document.getElementById('revenueAmount').value),
+            date: document.getElementById('revenueDate').value,
+            type: document.getElementById('revenueType').value,
+            category: document.getElementById('revenueCategory').value || 'Outros'
         };
 
-        if (revenue.id && revenue.id !== '') {
+        if (revenueId && revenueId !== '') {
             Storage.updateRevenue(revenue);
         } else {
             Storage.addRevenue(revenue);
@@ -272,23 +275,29 @@ class Dashboard {
         this.loadData();
         
         // Reload receitas page if active
-        if (window.receitas) {
+        if (typeof window.receitas !== 'undefined' && window.receitas.loadData) {
             window.receitas.loadData();
         }
+    } catch (error) {
+        console.error('Erro ao salvar receita:', error);
+        alert('Erro ao salvar receita. Verifique os dados e tente novamente.');
     }
+}
 
-    handleExpenseSubmit() {
-        const formData = new FormData(document.getElementById('expenseForm'));
+handleExpenseSubmit() {
+    try {
+        const expenseId = document.getElementById('expenseId').value;
+        
         const expense = {
-            id: document.getElementById('expenseId').value || Date.now().toString(),
-            description: formData.get('expenseDescription'),
-            amount: parseFloat(formData.get('expenseAmount')),
-            date: formData.get('expenseDate'),
-            type: formData.get('expenseType'),
-            category: formData.get('expenseCategory')
+            id: expenseId || Date.now().toString(),
+            description: document.getElementById('expenseDescription').value,
+            amount: parseFloat(document.getElementById('expenseAmount').value),
+            date: document.getElementById('expenseDate').value,
+            type: document.getElementById('expenseType').value,
+            category: document.getElementById('expenseCategory').value
         };
 
-        if (expense.id && expense.id !== '') {
+        if (expenseId && expenseId !== '') {
             Storage.updateExpense(expense);
         } else {
             Storage.addExpense(expense);
@@ -298,12 +307,16 @@ class Dashboard {
         this.loadData();
         
         // Reload despesas page if active
-        if (window.despesas) {
+        if (typeof window.despesas !== 'undefined' && window.despesas.loadData) {
             window.despesas.loadData();
         }
+    } catch (error) {
+        console.error('Erro ao salvar despesa:', error);
+        alert('Erro ao salvar despesa. Verifique os dados e tente novamente.');
     }
+}
 
-    formatCurrency(value) {
+formatCurrency(value) {
         return new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL'
