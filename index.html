@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro Pessoal</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h2>💰 Finanças</h2>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="nav-link active" data-page="dashboard">📊 Dashboard</a></li>
+                <li><a href="#" class="nav-link" data-page="receitas">💰 Receitas</a></li>
+                <li><a href="#" class="nav-link" data-page="despesas">💸 Despesas</a></li>
+                <li><a href="#" class="nav-link" data-page="futuras">📅 Futuras</a></li>
+                <li><a href="#" class="nav-link" data-page="relatorios">📋 Relatórios</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <div class="page-header">
+                    <h1>Dashboard Financeiro</h1>
+                    <div class="period-selector">
+                        <select id="periodSelect">
+                            <option value="month">Este Mês</option>
+                            <option value="year">Este Ano</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Metrics Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card income">
+                        <div class="metric-header">
+                            <h3>Receitas</h3>
+                            <span class="metric-icon">📈</span>
+                        </div>
+                        <div class="metric-value" id="totalIncome">R$ 0,00</div>
+                        <p class="metric-description">Total de entradas</p>
+                    </div>
+
+                    <div class="metric-card expense">
+                        <div class="metric-header">
+                            <h3>Despesas</h3>
+                            <span class="metric-icon">📉</span>
+                        </div>
+                        <div class="metric-value" id="totalExpenses">R$ 0,00</div>
+                        <p class="metric-description">Total de saídas</p>
+                    </div>
+
+                    <div class="metric-card balance">
+                        <div class="metric-header">
+                            <h3>Saldo</h3>
+                            <span class="metric-icon">💰</span>
+                        </div>
+                        <div class="metric-value" id="currentBalance">R$ 0,00</div>
+                        <p class="metric-description">Receitas - Despesas</p>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Evolução Mensal</h3>
+                        <div class="chart-container">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h3>Gastos por Categoria</h3>
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="transactions-card">
+                    <h3>Transações Recentes</h3>
+                    <div class="transactions-list" id="recentTransactions">
+                        <!-- Transactions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Receitas Page -->
+            <div id="receitas" class="page">
+                <div class="page-header">
+                    <h1>Gerenciar Receitas</h1>
+                    <button class="btn-primary" id="addRevenueBtn">+ Nova Receita</button>
+                </div>
+
+                <div class="revenue-sections">
+                    <!-- Receitas Fixas -->
+                    <section class="revenue-section">
+                        <h2>💰 Receitas Fixas</h2>
+                        <div class="revenue-list" id="fixedRevenueList">
+                            <!-- Fixed revenues will be loaded here -->
+                        </div>
+                    </section>
+
+                    <!-- Receitas Variáveis -->
+                    <section class="revenue-section">
+                        <h2>🎯 Receitas Variáveis</h2>
+                        <div class="revenue-list" id="variableRevenueList">
+                            <!-- Variable revenues will be loaded here -->
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Despesas Page -->
+            <div id="despesas" class="page">
+                <div class="page-header">
+                    <h1>Gerenciar Despesas</h1>
+                    <button class="btn-primary" id="addExpenseBtn">+ Nova Despesa</button>
+                </div>
+
+                <div class="expense-sections">
+                    <!-- Despesas Fixas -->
+                    <section class="expense-section">
+                        <h2>📋 Despesas Fixas</h2>
+                        <div class="expense-list" id="fixedExpenseList">
+                            <!-- Fixed expenses will be loaded here -->
+                        </div>
+                    </section>
+
+                    <!-- Despesas Variáveis -->
+                    <section class="expense-section">
+                        <h2>🎯 Despesas Variáveis</h2>
+                        <div class="expense-list" id="variableExpenseList">
+                            <!-- Variable expenses will be loaded here -->
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Despesas Futuras Page -->
+            <div id="futuras" class="page">
+                <div class="page-header">
+                    <h1>Despesas Futuras</h1>
+                    <button class="btn-primary" id="addFutureExpenseBtn">+ Agendar Despesa</button>
+                </div>
+                <div class="future-expenses-list" id="futureExpensesList">
+                    <!-- Future expenses will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Relatórios Page -->
+            <div id="relatorios" class="page">
+                <div class="page-header">
+                    <h1>Relatórios Personalizados</h1>
+                    <button class="btn-secondary" id="exportPdfBtn">📄 Exportar PDF</button>
+                </div>
+
+                <div class="report-filters">
+                    <div class="filter-group">
+                        <label>Período:</label>
+                        <select id="reportPeriod">
+                            <option value="month">Mês</option>
+                            <option value="year">Ano</option>
+                            <option value="quarter">Trimestre</option>
+                            <option value="semester">Semestre</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>De:</label>
+                        <input type="date" id="startDate">
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Até:</label>
+                        <input type="date" id="endDate">
+                    </div>
+
+                    <button class="btn-primary" id="generateReportBtn">Gerar Relatório</button>
+                </div>
+
+                <div class="report-results">
+                    <div class="report-charts">
+                        <canvas id="reportChart"></canvas>
+                    </div>
+                    <div class="report-table">
+                        <table id="reportDataTable">
+                            <!-- Report data will be loaded here -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="revenueModal" class="modal">
+        <div class="modal-content">
+            <h3 id="revenueModalTitle">Nova Receita</h3>
+            <form id="revenueForm">
+                <input type="hidden" id="revenueId">
+                <div class="form-group">
+                    <label>Descrição:</label>
+                    <input type="text" id="revenueDescription" required>
+                </div>
+                <div class="form-group">
+                    <label>Valor:</label>
+                    <input type="number" id="revenueAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Data:</label>
+                    <input type="date" id="revenueDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo:</label>
+                    <select id="revenueType">
+                        <option value="fixed">Fixa</option>
+                        <option value="variable">Variável</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Categoria:</label>
+                    <input type="text" id="revenueCategory">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelRevenueBtn">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="expenseModal" class="modal">
+        <div class="modal-content">
+            <h3 id="expenseModalTitle">Nova Despesa</h3>
+            <form id="expenseForm">
+                <input type="hidden" id="expenseId">
+                <div class="form-group">
+                    <label>Descrição:</label>
+                    <input type="text" id="expenseDescription" required>
+                </div>
+                <div class="form-group">
+                    <label>Valor:</label>
+                    <input type="number" id="expenseAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Data:</label>
+                    <input type="date" id="expenseDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo:</label>
+                    <select id="expenseType">
+                        <option value="fixed">Fixa</option>
+                        <option value="variable">Variável</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Categoria:</label>
+                    <input type="text" id="expenseCategory" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelExpenseBtn">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="scripts/app.js"></script>
+    <script src="scripts/dashboard.js"></script>
+    <script src="scripts/receitas.js"></script>
+    <script src="scripts/despesas.js"></script>
+    <script src="scripts/relatorios.js"></script>
+    <script src="data/storage.js"></script>
+</body>
+</html>
