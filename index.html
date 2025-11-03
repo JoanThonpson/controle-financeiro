@@ -258,13 +258,36 @@
                     <label>Data:</label>
                     <input type="date" id="expenseDate" required>
                 </div>
-                <div class="form-group">
-                    <label>Tipo:</label>
-                    <select id="expenseType">
-                        <option value="fixed">Fixa</option>
-                        <option value="variable">Variável</option>
-                    </select>
-                </div>
+                <!-- NO modal de despesas, APÓS o campo categoria -->
+<div class="form-group" id="expenseTypeGroup">
+    <label>Tipo:</label>
+    <select id="expenseType" required>
+        <option value="fixed">Fixa</option>
+        <option value="variable">Variável</option>
+    </select>
+</div>
+
+<!-- NOVOS CAMPOS PARA DESPESAS VARIÁVEIS -->
+<div class="form-group" id="variableFields">
+    <label>Forma de Pagamento:</label>
+    <select id="expensePaymentMethod">
+        <option value="dinheiro">Dinheiro</option>
+        <option value="cartao_credito">Cartão de Crédito</option>
+        <option value="cartao_debito">Cartão de Débito</option>
+        <option value="pix">PIX</option>
+        <option value="transferencia">Transferência</option>
+    </select>
+</div>
+
+<div class="form-group" id="localField">
+    <label>Local/Estabelecimento:</label>
+    <input type="text" id="expenseLocal" placeholder="Onde foi a compra?">
+</div>
+
+<div class="form-group">
+    <label>Observações:</label>
+    <textarea id="expenseNotes" placeholder="Alguma observação importante..."></textarea>
+</div>
                 <div class="form-group">
                     <label>Categoria:</label>
                     <input type="text" id="expenseCategory" required>

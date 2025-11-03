@@ -83,21 +83,71 @@ class App {
         document.getElementById('revenueForm').reset();
     }
 
-    openExpenseModal(editData = null) {
-        const modal = document.getElementById('expenseModal');
-        const title = document.getElementById('expenseModalTitle');
-        const form = document.getElementById('expenseForm');
+    // NO app.js - MODIFICAR openExpenseModal
+openExpenseModal(editData = null) {
+    const modal = document.getElementById('expenseModal');
+    const title = document.getElementById('expenseModalTitle');
+    const form = document.getElementById('expenseForm');
+    const typeGroup = document.getElementById('expenseTypeGroup');
+    const variableFields = document.getElementById('variableFields');
+    const localField = document.getElementById('localField');
 
-        if (editData) {
-            title.textContent = 'Editar Despesa';
-            this.fillExpenseForm(editData);
-        } else {
-            title.textContent = 'Nova Despesa';
-            form.reset();
-        }
-
-        modal.style.display = 'block';
+    if (editData) {
+        title.textContent = 'Editar Despesa';
+        this.fillExpenseForm(editData);
+        
+        // ⭐⭐ OCULTAR campo tipo na edição ⭐⭐
+        typeGroup.style.display = 'none';
+        
+        // ⭐⭐ MOSTRAR/OCULTAR campos extras baseado no tipo ⭐⭐
+        this.toggleVariableFields(editData.type);
+    } else {
+        title.textContent = 'Nova Despesa';
+        form.reset();
+        
+        // ⭐⭐ MOSTRAR campo tipo no cadastro novo ⭐⭐
+        typeGroup.style.display = 'block';
+        
+        // ⭐⭐ ESCONDER campos extras inicialmente ⭐⭐
+        this.toggleVariableFields('fixed');
     }
+
+    modal.style.display = 'block';
+    
+    // ⭐⭐ LISTENER para mostrar campos quando tipo mudar ⭐⭐
+    document.getElementById('expenseType').addEventListener('change', (e) => {
+        this.toggleVariableFields(e.target.value);
+    });
+}
+
+// ⭐⭐ NOVO MÉTODO para controlar campos variáveis ⭐⭐
+toggleVariableFields(expenseType) {
+    const variableFields = document.getElementById('variableFields');
+    const localField = document.getElementById('localField');
+    
+    if (expenseType === 'variable') {
+        variableFields.style.display = 'block';
+        localField.style.display = 'block';
+    } else {
+        variableFields.style.display = 'none';
+        localField.style.display = 'none';
+    }
+}
+
+
+fillExpenseForm(data) {
+    document.getElementById('expenseId').value = data.id;
+    document.getElementById('expenseDescription').value = data.description;
+    document.getElementById('expenseAmount').value = data.amount;
+    document.getElementById('expenseDate').value = data.date;
+    document.getElementById('expenseType').value = data.type;
+    document.getElementById('expenseCategory').value = data.category;
+    
+    
+    document.getElementById('expensePaymentMethod').value = data.paymentMethod || 'dinheiro';
+    document.getElementById('expenseLocal').value = data.local || '';
+    document.getElementById('expenseNotes').value = data.notes || '';
+}
 
     closeExpenseModal() {
         document.getElementById('expenseModal').style.display = 'none';

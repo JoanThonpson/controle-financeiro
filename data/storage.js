@@ -87,4 +87,17 @@ class Storage {
             return expenseDate >= new Date(startDate) && expenseDate <= new Date(endDate);
         });
     }
+
+    static updateExpense(updatedExpense) {
+    const data = this.getData();
+    const index = data.expenses.findIndex(e => e.id === updatedExpense.id);
+    if (index !== -1) {
+        // ⭐⭐ GARANTIR que campos antigos não sejam perdidos ⭐⭐
+        data.expenses[index] = { ...data.expenses[index], ...updatedExpense };
+        this.saveData(data);
+        return true;
+    }
+    return false;
+}
+
 }
