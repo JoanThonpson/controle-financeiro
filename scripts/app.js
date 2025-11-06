@@ -264,36 +264,45 @@ class App {
     }
 
     loadPageData(page) {
-        console.log('📂 Carregando dados da página:', page);
-        
-        switch(page) {
-            case 'dashboard':
+    console.log('📂 Carregando dados da página:', page);
+    
+    switch(page) {
+        case 'dashboard':
+            // ✅ CORREÇÃO: Garantir que dashboard existe antes de chamar
+            setTimeout(() => {
                 if (window.dashboard && typeof window.dashboard.loadData === 'function') {
                     window.dashboard.loadData();
                 } else {
-                    console.error('❌ Dashboard não disponível');
+                    console.log('⏳ Dashboard ainda não inicializado, aguardando...');
+                    // Tentar novamente após um tempo
+                    setTimeout(() => {
+                        if (window.dashboard && typeof window.dashboard.loadData === 'function') {
+                            window.dashboard.loadData();
+                        }
+                    }, 500);
                 }
-                break;
-            case 'receitas':
-                if (window.receitas && typeof window.receitas.loadData === 'function') {
-                    window.receitas.loadData();
-                }
-                break;
-            case 'despesas':
-                if (window.despesas && typeof window.despesas.loadData === 'function') {
-                    window.despesas.loadData();
-                }
-                break;
-            case 'futuras':
-                if (window.futuras && typeof window.futuras.loadData === 'function') {
-                    window.futuras.loadData();
-                }
-                break;
-            case 'relatorios':
-                if (window.relatorios && typeof window.relatorios.loadData === 'function') {
-                    window.relatorios.loadData();
-                }
-                break;
+            }, 100);
+            break;
+        case 'receitas':
+            if (window.receitas && typeof window.receitas.loadData === 'function') {
+                window.receitas.loadData();
+            }
+            break;
+        case 'despesas':
+            if (window.despesas && typeof window.despesas.loadData === 'function') {
+                window.despesas.loadData();
+            }
+            break;
+        case 'futuras':
+            if (window.futuras && typeof window.futuras.loadData === 'function') {
+                window.futuras.loadData();
+            }
+            break;
+        case 'relatorios':
+            if (window.relatorios && typeof window.relatorios.loadData === 'function') {
+                window.relatorios.loadData();
+            }
+            break;
         }
     }
 }

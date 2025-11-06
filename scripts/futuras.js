@@ -19,7 +19,6 @@ class Futuras {
 
         // ✅ CORREÇÃO: REMOVER event listener conflitante do expenseForm
         // O expenseForm já é gerenciado pela classe Despesas
-        // Não devemos ter dois listeners competindo pelo mesmo form
     }
 
     loadData() {
@@ -35,8 +34,6 @@ class Futuras {
         
         // Sort by date
         const sortedExpenses = expenses.sort((a, b) => new Date(a.date) - new Date(b.date));
-        
-        console.log('📅 Despesas futuras para renderizar:', sortedExpenses);
 
         if (sortedExpenses.length === 0) {
             container.innerHTML = `
@@ -91,10 +88,10 @@ class Futuras {
             document.getElementById('expenseDate').value = nextMonth.toISOString().split('T')[0];
         }
 
-        // ✅ CORREÇÃO: Mostrar campo de tipo para despesas futuras
+        // ✅ CORREÇÃO: OCULTAR campo "Tipo" para despesas futuras
         const typeGroup = document.getElementById('expenseTypeGroup');
         if (typeGroup) {
-            typeGroup.style.display = 'block';
+            typeGroup.style.display = 'none';
         }
 
         modal.style.display = 'block';
@@ -105,86 +102,59 @@ class Futuras {
         document.getElementById('expenseDescription').value = data.description;
         document.getElementById('expenseAmount').value = data.amount;
         document.getElementById('expenseDate').value = data.date;
-        document.getElementById('expenseType').value = data.type || 'variable';
         document.getElementById('expenseCategory').value = data.category;
         document.getElementById('expensePaymentMethod').value = data.paymentMethod || 'dinheiro';
         document.getElementById('expenseNotes').value = data.notes || '';
+        
+        // ✅ CORREÇÃO: Não preencher tipo (campo estará oculto)
     }
 
     editFutureExpense(id) {
         const data = Storage.getData();
         const expense = data.futureExpenses.find(e => e.id === id);
         if (expense) {
-            console.log('✏️ Editando despesa futura:', expense);
             this.openFutureExpenseModal(expense);
         }
     }
 
-    // ✅ NOVO MÉTODO: Handle específico para despesas futuras
+    // ✅ CORREÇÃO: Handle específico para despesas futuras
     handleFutureExpenseSubmit() {
         try {
-            console.log('📝 Iniciando submit da despesa FUTURA...');
-            
             const expenseId = document.getElementById('expenseId').value;
-            const isEditing = !!expenseId;
             
-            // ✅ VALIDAÇÃO
-            const description = document.getElementById('expenseDescription').value.trim();
-            const amount = parseFloat(document.getElementById('expenseAmount').value);
-            const date = document.getElementById('expenseDate').value;
-            const category = document.getElementById('expenseCategory').value.trim();
-            
-            if (!description || !amount || !date || !category) {
-                alert('❌ Por favor, preencha todos os campos obrigatórios (Descrição, Valor, Data e Categoria).');
-                return;
-            }
-
-            if (amount <= 0 || isNaN(amount)) {
-                alert('❌ O valor deve ser maior que zero.');
-                return;
-            }
-
-            const paymentMethod = document.getElementById('expensePaymentMethod').value;
-            const notes = document.getElementById('expenseNotes').value;
-            const type = document.getElementById('expenseType').value;
-
             const expense = {
                 id: expenseId || Date.now().toString(),
-                description: description,
-                amount: amount,
-                date: date,
-                category: category,
-                type: type,
-                paymentMethod: paymentMethod,
-                notes: notes,
-                // ✅ GARANTIR que seja salva como despesa FUTURA
+                description: document.getElementById('expenseDescription').value,
+                amount: parseFloat(document.getElementById('expenseAmount').value),
+                date: document.getElementById('expenseDate').value,
+                category: document.getElementById('expenseCategory').value,
+                // ✅ CORREÇÃO: Tipo fixo como 'variable' para futuras
+                type: 'variable',
+                paymentMethod: document.getElementById('expensePaymentMethod').value,
+                notes: document.getElementById('expenseNotes').value,
+                // ✅ CORREÇÃO: Garantir que seja salva como despesa FUTURA
                 isFuture: true
             };
 
-            console.log('💾 Salvando despesa FUTURA:', expense);
+            if (!expense.description || !expense.amount || !expense.date || !expense.category) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
 
-            // ✅ SALVAR APENAS COMO DESPESA FUTURA
-            if (isEditing) {
+            if (expenseId && expenseId !== '') {
+                // Update existing expense
                 Storage.updateFutureExpense(expense);
-                console.log('✅ Despesa futura atualizada');
             } else {
+                // Add new future expense
                 Storage.addFutureExpense(expense);
-                console.log('✅ Nova despesa futura criada');
             }
 
             window.app.closeExpenseModal();
             this.loadData();
             
-            // ✅ ATUALIZAR DASHBOARD
-            if (window.dashboard && window.dashboard.loadData) {
-                window.dashboard.loadData();
-            }
-            
-            alert(`✅ Despesa futura ${isEditing ? 'atualizada' : 'agendada'} com sucesso!`);
-            
         } catch (error) {
-            console.error('❌ Erro ao salvar despesa futura:', error);
-            alert('❌ Erro ao salvar despesa futura. Verifique os dados.');
+            console.error('Erro ao salvar despesa futura:', error);
+            alert('Erro ao salvar despesa futura. Verifique os dados e tente novamente.');
         }
     }
 
@@ -192,11 +162,6 @@ class Futuras {
         if (confirm('Tem certeza que deseja excluir esta despesa futura?')) {
             Storage.deleteFutureExpense(id);
             this.loadData();
-            
-            // Update dashboard if active
-            if (window.dashboard && window.dashboard.loadData) {
-                window.dashboard.loadData();
-            }
         }
     }
 
@@ -224,7 +189,6 @@ class Futuras {
         return `Vence em ${diffDays} dias`;
     }
 
-    // ✅ FORMATAÇÃO FORMA DE PAGAMENTO
     formatPaymentMethod(method) {
         const methods = {
             'dinheiro': 'Dinheiro',
@@ -248,25 +212,7 @@ class Futuras {
     }
 }
 
-// ✅ CORREÇÃO: Adicionar event listener específico para despesas futuras
+// ✅ CORREÇÃO: Inicialização simples sem conflitos
 document.addEventListener('DOMContentLoaded', () => {
     window.futuras = new Futuras();
-    
-    // ✅ LISTENER ESPECÍFICO para detectar quando o modal é aberto para despesas futuras
-    document.addEventListener('click', (e) => {
-        if (e.target.id === 'addFutureExpenseBtn' || 
-            (e.target.closest && e.target.closest('#addFutureExpenseBtn'))) {
-            
-            // ✅ REMOVER qualquer listener anterior do form
-            const expenseForm = document.getElementById('expenseForm');
-            const newExpenseForm = expenseForm.cloneNode(true);
-            expenseForm.parentNode.replaceChild(newExpenseForm, expenseForm);
-            
-            // ✅ ADICIONAR listener específico para despesas futuras
-            newExpenseForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                window.futuras.handleFutureExpenseSubmit();
-            });
-        }
-    });
 });

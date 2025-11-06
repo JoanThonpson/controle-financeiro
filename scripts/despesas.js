@@ -16,22 +16,21 @@ class Despesas {
     }
 
     loadData() {
+        console.log('🔄 Carregando dados das despesas...');
         const data = Storage.getData();
+        
         // ✅ CORREÇÃO: Usar apenas despesas normais (não futuras)
         const normalExpenses = data.expenses.filter(expense => !expense.isFuture);
+        
         this.renderFixedExpenses(normalExpenses);
         this.renderVariableExpenses(normalExpenses);
     }
 
     renderFixedExpenses(expenses) {
         const container = document.getElementById('fixedExpenseList');
-        if (!container) {
-            console.error('Container #fixedExpenseList não encontrado');
-            return;
-        }
+        if (!container) return;
 
         const fixedExpenses = expenses.filter(e => e.type === 'fixed');
-        console.log('🔧 Despesas fixas para renderizar:', fixedExpenses);
 
         if (fixedExpenses.length === 0) {
             container.innerHTML = `
@@ -67,7 +66,6 @@ class Despesas {
         if (!container) return;
 
         const variableExpenses = expenses.filter(e => e.type === 'variable');
-        console.log('🎯 Despesas variáveis para renderizar:', variableExpenses);
 
         if (variableExpenses.length === 0) {
             container.innerHTML = `
@@ -100,13 +98,9 @@ class Despesas {
 
     editExpense(id) {
         const data = Storage.getData();
-        // ✅ CORREÇÃO: Buscar apenas em despesas normais
         const expense = data.expenses.find(e => e.id === id && !e.isFuture);
         if (expense) {
-            console.log('✏️ Editando despesa:', expense);
             window.app.openExpenseModal(expense);
-        } else {
-            console.error('❌ Despesa não encontrada ou é uma despesa futura');
         }
     }
 
@@ -115,28 +109,22 @@ class Despesas {
             Storage.deleteExpense(id);
             this.loadData();
             
-            // Update dashboard if active
             if (window.dashboard && window.dashboard.loadData) {
                 window.dashboard.loadData();
             }
         }
     }
 
-    // ✅ MÉTODO handleExpenseSubmit CORRIGIDO - SALVAR APENAS COMO DESPESA NORMAL
     handleExpenseSubmit() {
         try {
-            console.log('📝 Iniciando submit da despesa NORMAL...');
-            
             const expenseId = document.getElementById('expenseId').value;
             const isEditing = !!expenseId;
             
-            // ✅ VALIDAÇÃO SIMPLES - APENAS 4 CAMPOS OBRIGATÓRIOS
             const description = document.getElementById('expenseDescription').value.trim();
             const amount = parseFloat(document.getElementById('expenseAmount').value);
             const date = document.getElementById('expenseDate').value;
             const category = document.getElementById('expenseCategory').value.trim();
             
-            // ✅ VALIDAÇÃO IDÊNTICA ÀS RECEITAS
             if (!description || !amount || !date || !category) {
                 alert('❌ Por favor, preencha todos os campos obrigatórios (Descrição, Valor, Data e Categoria).');
                 return;
@@ -147,11 +135,9 @@ class Despesas {
                 return;
             }
 
-            // ✅ CAMPOS NÃO OBRIGATÓRIOS
             const paymentMethod = document.getElementById('expensePaymentMethod').value;
             const notes = document.getElementById('expenseNotes').value;
 
-            // ✅ DETERMINA TIPO (igual receitas)
             let type;
             if (isEditing) {
                 const originalData = Storage.getData();
@@ -170,26 +156,18 @@ class Despesas {
                 type: type,
                 paymentMethod: paymentMethod,
                 notes: notes,
-                // ✅ GARANTIR que seja salva como despesa NORMAL
                 isFuture: false
             };
 
-            console.log('💾 Salvando despesa NORMAL:', expense);
-
-            // ✅ SALVAR APENAS COMO DESPESA NORMAL
             if (isEditing) {
                 Storage.updateExpense(expense);
-                console.log('✅ Despesa normal atualizada');
             } else {
                 Storage.addExpense(expense);
-                console.log('✅ Nova despesa normal criada');
             }
 
-            // ✅ FECHA MODAL E RECARREGA
             window.app.closeExpenseModal();
             this.loadData();
             
-            // ✅ ATUALIZAR DASHBOARD
             if (window.dashboard && window.dashboard.loadData) {
                 window.dashboard.loadData();
             }
@@ -202,7 +180,6 @@ class Despesas {
         }
     }
 
-    // ✅ FORMATAÇÃO FORMA DE PAGAMENTO
     formatPaymentMethod(method) {
         const methods = {
             'dinheiro': 'Dinheiro',
@@ -214,7 +191,6 @@ class Despesas {
         return methods[method] || method;
     }
 
-    // ✅ MÉTODOS DE FORMATAÇÃO
     formatCurrency(value) {
         return new Intl.NumberFormat('pt-BR', {
             style: 'currency',
@@ -227,7 +203,7 @@ class Despesas {
     }
 }
 
-// Initialize despesas when DOM is loaded
+// ✅ CORREÇÃO SIMPLES: Voltar à inicialização original
 document.addEventListener('DOMContentLoaded', () => {
     window.despesas = new Despesas();
 });
