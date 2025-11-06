@@ -17,8 +17,10 @@ class Despesas {
 
     loadData() {
         const data = Storage.getData();
-        this.renderFixedExpenses(data.expenses);
-        this.renderVariableExpenses(data.expenses);
+        // ✅ CORREÇÃO: Usar apenas despesas normais (não futuras)
+        const normalExpenses = data.expenses.filter(expense => !expense.isFuture);
+        this.renderFixedExpenses(normalExpenses);
+        this.renderVariableExpenses(normalExpenses);
     }
 
     renderFixedExpenses(expenses) {
@@ -98,10 +100,13 @@ class Despesas {
 
     editExpense(id) {
         const data = Storage.getData();
-        const expense = data.expenses.find(e => e.id === id);
+        // ✅ CORREÇÃO: Buscar apenas em despesas normais
+        const expense = data.expenses.find(e => e.id === id && !e.isFuture);
         if (expense) {
             console.log('✏️ Editando despesa:', expense);
             window.app.openExpenseModal(expense);
+        } else {
+            console.error('❌ Despesa não encontrada ou é uma despesa futura');
         }
     }
 
@@ -117,16 +122,15 @@ class Despesas {
         }
     }
 
-    // ✅ MÉTODO handleExpenseSubmit CORRIGIDO - MESMO PADRÃO DAS RECEITAS
+    // ✅ MÉTODO handleExpenseSubmit CORRIGIDO - SALVAR APENAS COMO DESPESA NORMAL
     handleExpenseSubmit() {
         try {
-            console.log('📝 Iniciando submit da despesa...');
+            console.log('📝 Iniciando submit da despesa NORMAL...');
             
-            // ✅ DETECÇÃO DE NOVA/EDIÇÃO (igual receitas)
             const expenseId = document.getElementById('expenseId').value;
             const isEditing = !!expenseId;
             
-            // ✅ VALIDAÇÃO SIMPLES - APENAS 4 CAMPOS OBRIGATÓRIOS (igual receitas)
+            // ✅ VALIDAÇÃO SIMPLES - APENAS 4 CAMPOS OBRIGATÓRIOS
             const description = document.getElementById('expenseDescription').value.trim();
             const amount = parseFloat(document.getElementById('expenseAmount').value);
             const date = document.getElementById('expenseDate').value;
@@ -135,15 +139,15 @@ class Despesas {
             // ✅ VALIDAÇÃO IDÊNTICA ÀS RECEITAS
             if (!description || !amount || !date || !category) {
                 alert('❌ Por favor, preencha todos os campos obrigatórios (Descrição, Valor, Data e Categoria).');
-                return; // ⭐⭐ PARA A EXECUÇÃO SE HOUVER ERRO
+                return;
             }
 
             if (amount <= 0 || isNaN(amount)) {
                 alert('❌ O valor deve ser maior que zero.');
-                return; // ⭐⭐ PARA A EXECUÇÃO SE HOUVER ERRO
+                return;
             }
 
-            // ✅ CAMPOS NÃO OBRIGATÓRIOS (após a validação)
+            // ✅ CAMPOS NÃO OBRIGATÓRIOS
             const paymentMethod = document.getElementById('expensePaymentMethod').value;
             const notes = document.getElementById('expenseNotes').value;
 
@@ -165,38 +169,37 @@ class Despesas {
                 category: category,
                 type: type,
                 paymentMethod: paymentMethod,
-                notes: notes
+                notes: notes,
+                // ✅ GARANTIR que seja salva como despesa NORMAL
+                isFuture: false
             };
 
-            console.log('💾 Salvando despesa:', expense);
+            console.log('💾 Salvando despesa NORMAL:', expense);
 
-            // ✅ SALVA (igual receitas)
+            // ✅ SALVAR APENAS COMO DESPESA NORMAL
             if (isEditing) {
                 Storage.updateExpense(expense);
-                console.log('✅ Despesa atualizada');
+                console.log('✅ Despesa normal atualizada');
             } else {
                 Storage.addExpense(expense);
-                console.log('✅ Nova despesa criada');
+                console.log('✅ Nova despesa normal criada');
             }
 
-            // ✅ FECHA MODAL E RECARREGA (igual receitas)
+            // ✅ FECHA MODAL E RECARREGA
             window.app.closeExpenseModal();
             this.loadData();
             
-            // ✅ APENAS ESTA MENSAGEM DEVE APARECER (igual receitas)
+            // ✅ ATUALIZAR DASHBOARD
+            if (window.dashboard && window.dashboard.loadData) {
+                window.dashboard.loadData();
+            }
+            
             alert(`✅ Despesa ${isEditing ? 'atualizada' : 'cadastrada'} com sucesso!`);
             
         } catch (error) {
             console.error('❌ Erro ao salvar despesa:', error);
             alert('❌ Erro ao salvar despesa. Verifique os dados.');
         }
-    }
-
-    // ✅ MÉTODO AUXILIAR PARA BUSCAR TIPO ORIGINAL
-    getOriginalExpenseType(expenseId) {
-        const data = Storage.getData();
-        const expense = data.expenses.find(e => e.id === expenseId);
-        return expense ? expense.type : 'fixed';
     }
 
     // ✅ FORMATAÇÃO FORMA DE PAGAMENTO

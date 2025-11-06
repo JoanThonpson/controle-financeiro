@@ -10,9 +10,15 @@ class Dashboard {
     }
 
     bindEvents() {
-        // Period selector
+        // Period selector - ✅ CORRIGIDO: Removido "Personalizado"
         const periodSelect = document.getElementById('periodSelect');
         if (periodSelect) {
+            periodSelect.innerHTML = `
+                <option value="current-month">Este Mês</option>
+                <option value="last-month">Mês Anterior</option>
+                <option value="current-year">Este Ano</option>
+            `;
+            
             periodSelect.addEventListener('change', (e) => {
                 this.loadData();
             });
@@ -23,22 +29,81 @@ class Dashboard {
         console.log('📊 Carregando dados do dashboard...');
         
         try {
-            const data = Storage.getData();
-            console.log('📦 Dados carregados:', data);
+            const periodSelect = document.getElementById('periodSelect');
+            const selectedPeriod = periodSelect ? periodSelect.value : 'current-month';
             
-            this.updateMetrics(data);
-            this.updateRecentTransactions(data);
-            this.updateCharts(data);
+            console.log('📅 Período selecionado:', selectedPeriod);
+            
+            const data = Storage.getData();
+            const filteredData = this.filterDataByPeriod(data, selectedPeriod);
+            
+            console.log('📦 Dados filtrados:', filteredData);
+            
+            this.updateMetrics(filteredData);
+            this.updateRecentTransactions(filteredData);
+            this.updateCharts(filteredData, selectedPeriod);
         } catch (error) {
             console.error('❌ Erro ao carregar dados:', error);
         }
     }
 
+    // ✅ NOVO MÉTODO: Filtrar dados pelo período selecionado
+    filterDataByPeriod(data, period) {
+        const now = new Date();
+        let startDate, endDate;
+
+        switch(period) {
+            case 'last-month':
+                // ✅ CORREÇÃO: Mês anterior corretamente calculado
+                startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                endDate = new Date(now.getFullYear(), now.getMonth(), 0);
+                break;
+            case 'current-year':
+                startDate = new Date(now.getFullYear(), 0, 1);
+                endDate = new Date(now.getFullYear(), 11, 31);
+                break;
+            case 'current-month':
+            default:
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                break;
+        }
+
+        console.log('📅 Filtro aplicado:', { period, startDate, endDate });
+
+        // Filtrar receitas
+        const filteredRevenues = data.revenues.filter(revenue => {
+            const revenueDate = new Date(revenue.date);
+            return revenueDate >= startDate && revenueDate <= endDate;
+        });
+
+        // Filtrar despesas normais
+        const filteredExpenses = data.expenses.filter(expense => {
+            const expenseDate = new Date(expense.date);
+            return expenseDate >= startDate && expenseDate <= endDate;
+        });
+
+        // Filtrar despesas futuras
+        const filteredFutureExpenses = data.futureExpenses.filter(expense => {
+            const expenseDate = new Date(expense.date);
+            return expenseDate >= startDate && expenseDate <= endDate;
+        });
+
+        return {
+            revenues: filteredRevenues,
+            expenses: filteredExpenses,
+            futureExpenses: filteredFutureExpenses
+        };
+    }
+
     updateMetrics(data) {
         console.log('📈 Atualizando métricas...');
         
+        // ✅ INCLUIR futureExpenses nas métricas totais
         const totalIncome = data.revenues.reduce((sum, revenue) => sum + revenue.amount, 0);
-        const totalExpenses = data.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+        const totalNormalExpenses = data.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+        const totalFutureExpenses = data.futureExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+        const totalExpenses = totalNormalExpenses + totalFutureExpenses;
         const balance = totalIncome - totalExpenses;
 
         const incomeElement = document.getElementById('totalIncome');
@@ -52,7 +117,13 @@ class Dashboard {
             balanceElement.style.color = balance >= 0 ? '#059669' : '#dc2626';
         }
 
-        console.log('✅ Métricas atualizadas:', { totalIncome, totalExpenses, balance });
+        console.log('✅ Métricas atualizadas:', { 
+            totalIncome, 
+            totalNormalExpenses, 
+            totalFutureExpenses, 
+            totalExpenses, 
+            balance 
+        });
     }
 
     updateRecentTransactions(data) {
@@ -62,10 +133,11 @@ class Dashboard {
             return;
         }
 
-        // Combine and sort transactions by date
+        // ✅ COMBINAR receitas, despesas normais E futuras
         const allTransactions = [
             ...data.revenues.map(r => ({ ...r, type: 'income' })),
-            ...data.expenses.map(e => ({ ...e, type: 'expense' }))
+            ...data.expenses.map(e => ({ ...e, type: 'expense' })),
+            ...data.futureExpenses.map(f => ({ ...f, type: 'future-expense' }))
         ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
 
         console.log('🔄 Transações recentes:', allTransactions);
@@ -74,14 +146,18 @@ class Dashboard {
             container.innerHTML = '<div class="empty-state"><p>Nenhuma transação recente</p></div>';
         } else {
             container.innerHTML = allTransactions.map(transaction => `
-                <div class="transaction-item">
+                <div class="transaction-item ${transaction.type === 'future-expense' ? 'future-transaction' : ''}">
                     <div class="transaction-info">
-                        <div class="transaction-description">${transaction.description}</div>
+                        <div class="transaction-description">
+                            ${transaction.description}
+                            ${transaction.type === 'future-expense' ? ' ⏰' : ''}
+                        </div>
                         <div class="transaction-category">${transaction.category}</div>
                     </div>
                     <div class="transaction-details">
                         <div class="transaction-amount ${transaction.type}">
                             ${transaction.type === 'income' ? '+' : '-'} ${this.formatCurrency(transaction.amount)}
+                            ${transaction.type === 'future-expense' ? ' (Futura)' : ''}
                         </div>
                         <div class="transaction-date">${this.formatDate(transaction.date)}</div>
                     </div>
@@ -90,12 +166,12 @@ class Dashboard {
         }
     }
 
-    updateCharts(data) {
-        this.updateMonthlyChart(data);
+    updateCharts(data, period) {
+        this.updateMonthlyChart(data, period);
         this.updateCategoryChart(data);
     }
 
-    updateMonthlyChart(data) {
+    updateMonthlyChart(data, period) {
         const ctx = document.getElementById('monthlyChart')?.getContext('2d');
         if (!ctx) {
             console.error('❌ Canvas monthlyChart não encontrado');
@@ -107,8 +183,8 @@ class Dashboard {
             this.charts.monthly.destroy();
         }
 
-        // Group by month
-        const monthlyData = this.groupByMonth(data);
+        // ✅ CORREÇÃO: Agrupar pelos dados JÁ FILTRADOS pelo período
+        const monthlyData = this.groupFilteredDataByMonth(data, period);
         
         this.charts.monthly = new Chart(ctx, {
             type: 'line',
@@ -124,12 +200,21 @@ class Dashboard {
                         fill: true
                     },
                     {
-                        label: 'Despesas',
-                        data: monthlyData.expenses,
+                        label: 'Despesas Normais',
+                        data: monthlyData.normalExpenses,
                         borderColor: '#dc2626',
                         backgroundColor: 'rgba(220, 38, 38, 0.1)',
                         tension: 0.4,
                         fill: true
+                    },
+                    {
+                        label: 'Despesas Futuras',
+                        data: monthlyData.futureExpenses,
+                        borderColor: '#d97706',
+                        backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderDash: [5, 5]
                     }
                 ]
             },
@@ -139,6 +224,10 @@ class Dashboard {
                 plugins: {
                     legend: {
                         position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: this.getChartTitle(period)
                     }
                 },
                 scales: {
@@ -153,6 +242,83 @@ class Dashboard {
         });
     }
 
+    // ✅ NOVO MÉTODO: Agrupar dados já filtrados
+    groupFilteredDataByMonth(data, period) {
+        const now = new Date();
+        let months = {};
+        
+        // Definir range de meses baseado no período
+        switch(period) {
+            case 'last-month':
+                // Apenas o mês anterior
+                const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                const key = lastMonth.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+                months[key] = { income: 0, normalExpenses: 0, futureExpenses: 0 };
+                break;
+                
+            case 'current-year':
+                // Todos os meses do ano
+                for (let i = 0; i < 12; i++) {
+                    const date = new Date(now.getFullYear(), i, 1);
+                    const key = date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+                    months[key] = { income: 0, normalExpenses: 0, futureExpenses: 0 };
+                }
+                break;
+                
+            case 'current-month':
+            default:
+                // Apenas o mês atual
+                const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const currentKey = currentMonth.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+                months[currentKey] = { income: 0, normalExpenses: 0, futureExpenses: 0 };
+                break;
+        }
+
+        // Processar receitas
+        data.revenues.forEach(revenue => {
+            const date = new Date(revenue.date);
+            const key = date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+            if (months[key]) {
+                months[key].income += revenue.amount;
+            }
+        });
+
+        // Processar despesas normais
+        data.expenses.forEach(expense => {
+            const date = new Date(expense.date);
+            const key = date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+            if (months[key]) {
+                months[key].normalExpenses += expense.amount;
+            }
+        });
+
+        // Processar despesas futuras
+        data.futureExpenses.forEach(expense => {
+            const date = new Date(expense.date);
+            const key = date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+            if (months[key]) {
+                months[key].futureExpenses += expense.amount;
+            }
+        });
+
+        return {
+            labels: Object.keys(months),
+            income: Object.values(months).map(m => m.income),
+            normalExpenses: Object.values(months).map(m => m.normalExpenses),
+            futureExpenses: Object.values(months).map(m => m.futureExpenses)
+        };
+    }
+
+    // ✅ NOVO MÉTODO: Título do gráfico baseado no período
+    getChartTitle(period) {
+        const titles = {
+            'current-month': 'Este Mês',
+            'last-month': 'Mês Anterior', 
+            'current-year': 'Este Ano'
+        };
+        return titles[period] || 'Dashboard Financeiro';
+    }
+
     updateCategoryChart(data) {
         const ctx = document.getElementById('categoryChart')?.getContext('2d');
         if (!ctx) {
@@ -165,8 +331,9 @@ class Dashboard {
             this.charts.category.destroy();
         }
 
-        // Group expenses by category
-        const categoryData = this.groupByCategory(data.expenses);
+        // ✅ AGRUPAR despesas normais E futuras por categoria
+        const allExpenses = [...data.expenses, ...data.futureExpenses];
+        const categoryData = this.groupByCategory(allExpenses);
         
         this.charts.category = new Chart(ctx, {
             type: 'doughnut',
@@ -188,46 +355,14 @@ class Dashboard {
                 plugins: {
                     legend: {
                         position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Gastos por Categoria'
                     }
                 }
             }
         });
-    }
-
-    groupByMonth(data) {
-        const months = {};
-        const currentYear = new Date().getFullYear();
-        
-        // Initialize last 6 months
-        for (let i = 5; i >= 0; i--) {
-            const date = new Date(currentYear, new Date().getMonth() - i, 1);
-            const key = date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
-            months[key] = { income: 0, expenses: 0 };
-        }
-
-        // Add revenues
-        data.revenues.forEach(revenue => {
-            const date = new Date(revenue.date);
-            const key = date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
-            if (months[key]) {
-                months[key].income += revenue.amount;
-            }
-        });
-
-        // Add expenses
-        data.expenses.forEach(expense => {
-            const date = new Date(expense.date);
-            const key = date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
-            if (months[key]) {
-                months[key].expenses += expense.amount;
-            }
-        });
-
-        return {
-            labels: Object.keys(months),
-            income: Object.values(months).map(m => m.income),
-            expenses: Object.values(months).map(m => m.expenses)
-        };
     }
 
     groupByCategory(expenses) {
@@ -263,8 +398,42 @@ class Dashboard {
     }
 }
 
-// ✅ INICIALIZAÇÃO CORRETA DO DASHBOARD
+// ✅ CORREÇÃO: Inicialização mais robusta do Dashboard
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📊 Inicializando Dashboard...');
-    window.dashboard = new Dashboard();
+    
+    // Aguardar um pouco para garantir que o DOM esteja completamente carregado
+    setTimeout(() => {
+        if (document.getElementById('dashboard')?.classList.contains('active')) {
+            window.dashboard = new Dashboard();
+            console.log('✅ Dashboard inicializado com sucesso!');
+        } else {
+            console.log('⏳ Dashboard não é a página ativa, aguardando...');
+        }
+    }, 100);
+});
+
+// ✅ CORREÇÃO: Recarregar dashboard quando a página for ativada
+document.addEventListener('DOMContentLoaded', function() {
+    // Observar mudanças na página ativa
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                const dashboardPage = document.getElementById('dashboard');
+                if (dashboardPage && dashboardPage.classList.contains('active')) {
+                    if (!window.dashboard) {
+                        window.dashboard = new Dashboard();
+                    } else {
+                        window.dashboard.loadData();
+                    }
+                }
+            }
+        });
+    });
+
+    // Observar mudanças nas páginas
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(page => {
+        observer.observe(page, { attributes: true });
+    });
 });

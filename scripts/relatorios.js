@@ -99,8 +99,9 @@ class Relatorios {
             return;
         }
 
+        // ✅ CORREÇÃO: Incluir futureExpenses nos relatórios
         const revenues = Storage.getRevenuesByPeriod(startDate, endDate);
-        const expenses = Storage.getExpensesByPeriod(startDate, endDate);
+        const expenses = Storage.getExpensesByPeriod(startDate, endDate); // Já inclui futuras
 
         this.updateCharts(revenues, expenses, startDate, endDate);
         this.updateTable(revenues, expenses);
@@ -119,7 +120,7 @@ class Relatorios {
             this.chart.destroy();
         }
 
-        // Group by date
+        // ✅ CORREÇÃO: Incluir futureExpenses no agrupamento
         const dateData = this.groupByDate(revenues, expenses, startDate, endDate);
         
         this.chart = new Chart(ctx, {
@@ -135,7 +136,7 @@ class Relatorios {
                         borderWidth: 1
                     },
                     {
-                        label: 'Despesas',
+                        label: 'Despesas (Normais + Futuras)',
                         data: dateData.expenses,
                         backgroundColor: 'rgba(220, 38, 38, 0.8)',
                         borderColor: '#dc2626',
@@ -175,57 +176,61 @@ class Relatorios {
         const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
         const balance = totalIncome - totalExpenses;
 
-        // Group by category for detailed view
+        // ✅ CORREÇÃO: Agrupar despesas normais e futuras juntas
         const incomeByCategory = this.groupByCategory(revenues);
         const expensesByCategory = this.groupByCategory(expenses);
 
         container.innerHTML = `
-            <thead>
-                <tr>
-                    <th>Categoria</th>
-                    <th>Tipo</th>
-                    <th>Valor</th>
-                    <th>Percentual</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Income Rows -->
-                ${Object.entries(incomeByCategory).map(([category, amount]) => `
-                    <tr>
-                        <td>${category}</td>
-                        <td>Receita</td>
-                        <td style="color: #059669; font-weight: bold;">${this.formatCurrency(amount)}</td>
-                        <td>${totalIncome > 0 ? ((amount / totalIncome) * 100).toFixed(1) : '0'}%</td>
-                    </tr>
-                `).join('')}
-                
-                <!-- Expense Rows -->
-                ${Object.entries(expensesByCategory).map(([category, amount]) => `
-                    <tr>
-                        <td>${category}</td>
-                        <td>Despesa</td>
-                        <td style="color: #dc2626; font-weight: bold;">${this.formatCurrency(amount)}</td>
-                        <td>${totalExpenses > 0 ? ((amount / totalExpenses) * 100).toFixed(1) : '0'}%</td>
-                    </tr>
-                `).join('')}
-                
-                <!-- Totals -->
-                <tr style="border-top: 2px solid #1e293b; font-weight: bold;">
-                    <td colspan="2">TOTAL RECEITAS</td>
-                    <td style="color: #059669;">${this.formatCurrency(totalIncome)}</td>
-                    <td>100%</td>
-                </tr>
-                <tr>
-                    <td colspan="2">TOTAL DESPESAS</td>
-                    <td style="color: #dc2626;">${this.formatCurrency(totalExpenses)}</td>
-                    <td>100%</td>
-                </tr>
-                <tr style="border-top: 2px solid #1e293b; background: #f8fafc;">
-                    <td colspan="2">SALDO FINAL</td>
-                    <td style="color: ${balance >= 0 ? '#059669' : '#dc2626'};">${this.formatCurrency(balance)}</td>
-                    <td>-</td>
-                </tr>
-            </tbody>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Categoria</th>
+                            <th>Tipo</th>
+                            <th>Valor</th>
+                            <th>Percentual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Income Rows -->
+                        ${Object.entries(incomeByCategory).map(([category, amount]) => `
+                            <tr>
+                                <td>${category}</td>
+                                <td><span class="badge income-badge">Receita</span></td>
+                                <td style="color: #059669; font-weight: bold;">${this.formatCurrency(amount)}</td>
+                                <td>${totalIncome > 0 ? ((amount / totalIncome) * 100).toFixed(1) : '0'}%</td>
+                            </tr>
+                        `).join('')}
+                        
+                        <!-- Expense Rows -->
+                        ${Object.entries(expensesByCategory).map(([category, amount]) => `
+                            <tr>
+                                <td>${category}</td>
+                                <td><span class="badge expense-badge">Despesa</span></td>
+                                <td style="color: #dc2626; font-weight: bold;">${this.formatCurrency(amount)}</td>
+                                <td>${totalExpenses > 0 ? ((amount / totalExpenses) * 100).toFixed(1) : '0'}%</td>
+                            </tr>
+                        `).join('')}
+                        
+                        <!-- Totals -->
+                        <tr class="total-row">
+                            <td colspan="2"><strong>TOTAL RECEITAS</strong></td>
+                            <td style="color: #059669; font-weight: bold;">${this.formatCurrency(totalIncome)}</td>
+                            <td><strong>100%</strong></td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="2"><strong>TOTAL DESPESAS</strong></td>
+                            <td style="color: #dc2626; font-weight: bold;">${this.formatCurrency(totalExpenses)}</td>
+                            <td><strong>100%</strong></td>
+                        </tr>
+                        <tr class="balance-row ${balance >= 0 ? 'positive-balance' : 'negative-balance'}">
+                            <td colspan="2"><strong>SALDO FINAL</strong></td>
+                            <td style="color: ${balance >= 0 ? '#059669' : '#dc2626'}; font-weight: bold;">${this.formatCurrency(balance)}</td>
+                            <td><strong>-</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         `;
     }
 
@@ -249,7 +254,7 @@ class Relatorios {
             }
         });
 
-        // Add expenses
+        // ✅ CORREÇÃO: Incluir todas as despesas (normais + futuras)
         expenses.forEach(expense => {
             const key = expense.date;
             if (dates[key]) {
@@ -277,8 +282,103 @@ class Relatorios {
         return categories;
     }
 
+    // ✅ CORREÇÃO: Export PDF melhorado - remove sidebar e mantém apenas relatórios
     exportToPDF() {
+        // Criar estilos temporários para impressão
+        const printStyles = `
+            <style>
+                @media print {
+                    .sidebar, .nav-links, .page-header .btn-secondary, 
+                    .report-filters, #exportPdfBtn, .main-content > :not(#relatorios) {
+                        display: none !important;
+                    }
+                    
+                    .main-content {
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        width: 100% !important;
+                    }
+                    
+                    #relatorios {
+                        display: block !important;
+                        width: 100% !important;
+                        margin: 0 !important;
+                        padding: 20px !important;
+                    }
+                    
+                    .report-results {
+                        margin-top: 20px !important;
+                    }
+                    
+                    body {
+                        background: white !important;
+                        color: black !important;
+                    }
+                    
+                    .chart-container {
+                        page-break-inside: avoid;
+                    }
+                    
+                    .table-container {
+                        page-break-inside: avoid;
+                    }
+                    
+                    h1 {
+                        color: black !important;
+                        margin-bottom: 20px !important;
+                    }
+                }
+                
+                .badge {
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    font-weight: bold;
+                }
+                
+                .income-badge {
+                    background: #d1fae5;
+                    color: #065f46;
+                }
+                
+                .expense-badge {
+                    background: #fee2e2;
+                    color: #991b1b;
+                }
+                
+                .total-row {
+                    border-top: 2px solid #1e293b;
+                    background: #f8fafc;
+                }
+                
+                .balance-row {
+                    border-top: 3px double #1e293b;
+                    font-size: 1.1em;
+                }
+                
+                .positive-balance {
+                    background: #d1fae5 !important;
+                }
+                
+                .negative-balance {
+                    background: #fee2e2 !important;
+                }
+            </style>
+        `;
+        
+        // Adicionar estilos temporários
+        document.head.insertAdjacentHTML('beforeend', printStyles);
+        
+        // Chamar impressão
         window.print();
+        
+        // Remover estilos temporários após impressão
+        setTimeout(() => {
+            const styles = document.head.querySelectorAll('style');
+            if (styles.length > 0) {
+                styles[styles.length - 1].remove();
+            }
+        }, 1000);
     }
 
     formatCurrency(value) {

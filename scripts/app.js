@@ -227,8 +227,7 @@ class App {
 
     // ✅ MÉTODO toggleVariableFields CORRIGIDO - SEM REFERÊNCIAS A CAMPOS REMOVIDOS
     toggleVariableFields(expenseType) {
-        // ✅ MÉTODO SIMPLIFICADO - APENAS PARA COMPATIBILIDADE
-        // ✅ NÃO FAZ MAIS REFERÊNCIA A CAMPOS QUE FORAM REMOVIDOS
+        
         console.log('Tipo de despesa selecionado:', expenseType);
         
         // ❌ REMOVIDO - Referências a campos que não existem mais

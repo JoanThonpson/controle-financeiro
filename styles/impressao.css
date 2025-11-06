@@ -1,0 +1,230 @@
+/* ===== ESTILOS PARA IMPRESSÃO (EXPORT PDF) ===== */
+@media print {
+    /* 🔴 REMOVER elementos da interface */
+    .sidebar,
+    .nav-links, 
+    .page-header .btn-secondary,
+    #exportPdfBtn,
+    .report-filters,
+    .main-content > :not(#relatorios),
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger,
+    .btn-edit,
+    .item-actions,
+    .empty-state button {
+        display: none !important;
+    }
+    
+    /* ✅ MANTER apenas a página de relatórios */
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    #relatorios {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        position: static !important;
+    }
+    
+    /* ✅ AJUSTES de layout para impressão */
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 12px !important;
+        line-height: 1.4 !important;
+    }
+    
+    .page-header h1 {
+        color: black !important;
+        font-size: 18px !important;
+        margin-bottom: 10px !important;
+        text-align: center !important;
+    }
+    
+    /* ✅ EVITAR quebra de página em elementos importantes */
+    .chart-container {
+        page-break-inside: avoid !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .table-container {
+        page-break-inside: avoid !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .report-results {
+        margin-top: 0 !important;
+    }
+    
+    /* ✅ MELHORAR legibilidade da tabela */
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 11px !important;
+    }
+    
+    th, td {
+        border: 1px solid #ddd !important;
+        padding: 6px 8px !important;
+        text-align: left !important;
+    }
+    
+    th {
+        background: #f5f5f5 !important;
+        font-weight: bold !important;
+    }
+    
+    /* ✅ ESTILOS para badges na tabela */
+    .badge {
+        padding: 2px 6px !important;
+        border-radius: 3px !important;
+        font-size: 10px !important;
+        font-weight: bold !important;
+    }
+    
+    .income-badge {
+        background: #d1fae5 !important;
+        color: #065f46 !important;
+        border: 1px solid #a7f3d0 !important;
+    }
+    
+    .expense-badge {
+        background: #fee2e2 !important;
+        color: #991b1b !important;
+        border: 1px solid #fecaca !important;
+    }
+    
+    /* ✅ DESTAQUE para totais */
+    .total-row {
+        border-top: 2px solid #333 !important;
+        background: #f8f9fa !important;
+        font-weight: bold !important;
+    }
+    
+    .balance-row {
+        border-top: 3px double #333 !important;
+        font-size: 13px !important;
+        font-weight: bold !important;
+    }
+    
+    .positive-balance {
+        background: #d1fae5 !important;
+        color: #065f46 !important;
+    }
+    
+    .negative-balance {
+        background: #fee2e2 !important;
+        color: #991b1b !important;
+    }
+    
+    /* ✅ CORES para valores monetários */
+    .metric-value,
+    .item-amount,
+    td[style*="color: #059669"] {
+        color: #065f46 !important;
+        font-weight: bold !important;
+    }
+    
+    td[style*="color: #dc2626"] {
+        color: #991b1b !important;
+        font-weight: bold !important;
+    }
+    
+    /* ✅ AJUSTES no gráfico */
+    canvas {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* ✅ REMOVER sombras e efeitos visuais */
+    .metric-card,
+    .chart-card,
+    .transactions-card,
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        background: white !important;
+    }
+    
+    /* ✅ HEADER do relatório */
+    .page-header {
+        text-align: center !important;
+        margin-bottom: 15px !important;
+        padding-bottom: 10px !important;
+        border-bottom: 2px solid #333 !important;
+    }
+    
+    /* ✅ INFORMAÇÕES do período */
+    .report-period-info {
+        text-align: center !important;
+        font-style: italic !important;
+        margin-bottom: 15px !important;
+        color: #666 !important;
+    }
+}
+
+/* ===== ESTILOS PARA BADGES (também adicionar ao CSS principal) ===== */
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.income-badge {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.expense-badge {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+/* ===== ESTILOS PARA TABELAS DO RELATÓRIO ===== */
+.table-container {
+    overflow-x: auto;
+    margin: 20px 0;
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.table-container th {
+    background: #f8fafc;
+    font-weight: 600;
+    text-align: left;
+}
+
+.table-container tr.total-row {
+    background: #f1f5f9;
+    font-weight: bold;
+}
+
+.table-container tr.balance-row {
+    background: #e2e8f0;
+    font-size: 1.1em;
+}
+
+/* ===== ESTILOS PARA TRANSAÇÕES FUTURAS NO DASHBOARD ===== */
+.future-transaction {
+    border-left: 3px solid #d97706 !important;
+    background: #fffbeb !important;
+}
+
+.future-transaction .transaction-amount {
+    color: #d97706 !important;
+}
