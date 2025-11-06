@@ -38,6 +38,7 @@ class Receitas {
                 <div class="item-info">
                     <div class="item-description">${revenue.description}</div>
                     <div class="item-category">${revenue.category}</div>
+                    ${revenue.notes ? `<div class="item-notes">📝 ${revenue.notes}</div>` : ''}
                 </div>
                 <div class="item-details">
                     <div class="item-amount">${this.formatCurrency(revenue.amount)}</div>
@@ -77,6 +78,7 @@ class Receitas {
                 <div class="item-info">
                     <div class="item-description">${revenue.description}</div>
                     <div class="item-category">${revenue.category}</div>
+                    ${revenue.notes ? `<div class="item-notes">📝 ${revenue.notes}</div>` : ''}
                 </div>
                 <div class="item-details">
                     <div class="item-amount">${this.formatCurrency(revenue.amount)}</div>
@@ -120,31 +122,72 @@ class Receitas {
         }
     }
 
+    // ✅ SUBMIT CORRETO COM VALIDAÇÃO APENAS DOS CAMPOS OBRIGATÓRIOS
     handleRevenueSubmit() {
-        const revenueId = document.getElementById('revenueId').value;
-        
-        const revenue = {
-            id: revenueId || Date.now().toString(),
-            description: document.getElementById('revenueDescription').value,
-            amount: parseFloat(document.getElementById('revenueAmount').value),
-            date: document.getElementById('revenueDate').value,
-            type: document.getElementById('revenueType').value,
-            category: document.getElementById('revenueCategory').value || 'Outros'
-        };
+        try {
+            const revenueId = document.getElementById('revenueId').value;
+            const isEditing = !!revenueId;
+            
+            // ✅ VALIDAÇÃO APENAS DOS CAMPOS OBRIGATÓRIOS
+            const description = document.getElementById('revenueDescription').value.trim();
+            const amount = parseFloat(document.getElementById('revenueAmount').value);
+            const date = document.getElementById('revenueDate').value;
+            const category = document.getElementById('revenueCategory').value.trim();
+            
+            // ✅ APENAS 4 CAMPOS OBRIGATÓRIOS
+            if (!description || !amount || !date || !category) {
+                alert('❌ Por favor, preencha todos os campos obrigatórios (Descrição, Valor, Data e Categoria).');
+                return;
+            }
 
-        if (revenueId) {
-            Storage.updateRevenue(revenue);
-        } else {
-            Storage.addRevenue(revenue);
-        }
+            if (amount <= 0 || isNaN(amount)) {
+                alert('❌ O valor deve ser maior que zero.');
+                return;
+            }
 
-        window.app.closeRevenueModal();
-        this.loadData();
-        
-        // Update dashboard if active
-        if (window.dashboard && window.dashboard.loadData) {
-            window.dashboard.loadData();
+            const revenue = {
+                id: revenueId || Date.now().toString(),
+                description: description,
+                amount: amount,
+                date: date,
+                category: category,
+                // ✅ TIPO CORRETO (original na edição, novo no cadastro)
+                type: isEditing ? 
+                    this.getOriginalRevenueType(revenueId) :
+                    document.getElementById('revenueType').value,
+                // ✅ CAMPO OBSERVAÇÃO (NÃO OBRIGATÓRIO)
+                notes: document.getElementById('revenueNotes').value
+            };
+
+            console.log('💾 Salvando receita:', revenue);
+
+            if (revenueId) {
+                Storage.updateRevenue(revenue);
+            } else {
+                Storage.addRevenue(revenue);
+            }
+
+            window.app.closeRevenueModal();
+            this.loadData();
+            
+            // Update dashboard if active
+            if (window.dashboard && window.dashboard.loadData) {
+                window.dashboard.loadData();
+            }
+            
+            alert(`✅ Receita ${isEditing ? 'atualizada' : 'cadastrada'} com sucesso!`);
+            
+        } catch (error) {
+            console.error('Erro ao salvar receita:', error);
+            alert('❌ Erro ao salvar receita. Verifique os dados.');
         }
+    }
+
+    // ✅ MÉTODO AUXILIAR PARA BUSCAR TIPO ORIGINAL
+    getOriginalRevenueType(revenueId) {
+        const data = Storage.getData();
+        const revenue = data.revenues.find(r => r.id === revenueId);
+        return revenue ? revenue.type : 'fixed';
     }
 
     formatCurrency(value) {

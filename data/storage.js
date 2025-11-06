@@ -8,6 +8,7 @@ class Storage {
         localStorage.setItem('financialData', JSON.stringify(data));
     }
 
+    // ✅ RECEITAS
     static addRevenue(revenue) {
         const data = this.getData();
         revenue.id = Date.now().toString();
@@ -20,7 +21,7 @@ class Storage {
         const data = this.getData();
         const index = data.revenues.findIndex(r => r.id === updatedRevenue.id);
         if (index !== -1) {
-            data.revenues[index] = updatedRevenue;
+            data.revenues[index] = { ...data.revenues[index], ...updatedRevenue };
             this.saveData(data);
             return true;
         }
@@ -33,6 +34,7 @@ class Storage {
         this.saveData(data);
     }
 
+    // ✅ DESPESAS
     static addExpense(expense) {
         const data = this.getData();
         expense.id = Date.now().toString();
@@ -45,7 +47,8 @@ class Storage {
         const data = this.getData();
         const index = data.expenses.findIndex(e => e.id === updatedExpense.id);
         if (index !== -1) {
-            data.expenses[index] = updatedExpense;
+            // ⭐⭐ GARANTIR que campos antigos não sejam perdidos ⭐⭐
+            data.expenses[index] = { ...data.expenses[index], ...updatedExpense };
             this.saveData(data);
             return true;
         }
@@ -58,6 +61,7 @@ class Storage {
         this.saveData(data);
     }
 
+    // ✅ DESPESAS FUTURAS
     static addFutureExpense(expense) {
         const data = this.getData();
         expense.id = Date.now().toString();
@@ -72,6 +76,7 @@ class Storage {
         this.saveData(data);
     }
 
+    // ✅ CONSULTAS POR PERÍODO
     static getRevenuesByPeriod(startDate, endDate) {
         const data = this.getData();
         return data.revenues.filter(revenue => {
@@ -87,17 +92,4 @@ class Storage {
             return expenseDate >= new Date(startDate) && expenseDate <= new Date(endDate);
         });
     }
-
-    static updateExpense(updatedExpense) {
-    const data = this.getData();
-    const index = data.expenses.findIndex(e => e.id === updatedExpense.id);
-    if (index !== -1) {
-        // ⭐⭐ GARANTIR que campos antigos não sejam perdidos ⭐⭐
-        data.expenses[index] = { ...data.expenses[index], ...updatedExpense };
-        this.saveData(data);
-        return true;
-    }
-    return false;
-}
-
 }

@@ -10,14 +10,17 @@ class Relatorios {
     }
 
     bindEvents() {
+        // ✅ EVENTO CORRIGIDO PARA O SELECTOR DE PERÍODO
+        const reportPeriod = document.getElementById('reportPeriod');
+        if (reportPeriod) {
+            reportPeriod.addEventListener('change', (e) => {
+                this.handlePeriodChange(e.target.value);
+            });
+        }
+
         // Generate report button
         document.getElementById('generateReportBtn')?.addEventListener('click', () => {
             this.generateReport();
-        });
-
-        // Period selector change
-        document.getElementById('reportPeriod')?.addEventListener('change', (e) => {
-            this.handlePeriodChange(e.target.value);
         });
 
         // Export PDF button
@@ -31,11 +34,29 @@ class Relatorios {
         const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
         const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-        document.getElementById('startDate').value = firstDay.toISOString().split('T')[0];
-        document.getElementById('endDate').value = lastDay.toISOString().split('T')[0];
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        
+        if (startDateInput) startDateInput.value = firstDay.toISOString().split('T')[0];
+        if (endDateInput) endDateInput.value = lastDay.toISOString().split('T')[0];
     }
 
     handlePeriodChange(period) {
+        console.log('📅 Período selecionado:', period);
+        
+        const customDateFields = document.getElementById('customDateFields');
+        const customDateFieldsEnd = document.getElementById('customDateFieldsEnd');
+        
+        // ✅ MOSTRAR/OCULTAR CAMPOS DE DATA PERSONALIZADA
+        if (period === 'custom') {
+            if (customDateFields) customDateFields.style.display = 'block';
+            if (customDateFieldsEnd) customDateFieldsEnd.style.display = 'block';
+            return; // Não altera datas para custom
+        } else {
+            if (customDateFields) customDateFields.style.display = 'none';
+            if (customDateFieldsEnd) customDateFieldsEnd.style.display = 'none';
+        }
+
         const now = new Date();
         let startDate, endDate;
 
@@ -58,18 +79,20 @@ class Relatorios {
                 startDate = new Date(now.getFullYear(), semester * 6, 1);
                 endDate = new Date(now.getFullYear(), (semester + 1) * 6, 0);
                 break;
-            case 'custom':
-                // Don't change dates for custom
+            default:
                 return;
         }
 
-        document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
-        document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        
+        if (startDateInput) startDateInput.value = startDate.toISOString().split('T')[0];
+        if (endDateInput) endDateInput.value = endDate.toISOString().split('T')[0];
     }
 
     generateReport() {
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
+        const startDate = document.getElementById('startDate')?.value;
+        const endDate = document.getElementById('endDate')?.value;
 
         if (!startDate || !endDate) {
             alert('Por favor, selecione as datas de início e fim.');
@@ -130,13 +153,6 @@ class Relatorios {
                     title: {
                         display: true,
                         text: `Relatório: ${this.formatDate(startDate)} à ${this.formatDate(endDate)}`
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => {
-                                return `${context.dataset.label}: ${this.formatCurrency(context.raw)}`;
-                            }
-                        }
                     }
                 },
                 scales: {
@@ -179,7 +195,7 @@ class Relatorios {
                         <td>${category}</td>
                         <td>Receita</td>
                         <td style="color: #059669; font-weight: bold;">${this.formatCurrency(amount)}</td>
-                        <td>${((amount / totalIncome) * 100).toFixed(1)}%</td>
+                        <td>${totalIncome > 0 ? ((amount / totalIncome) * 100).toFixed(1) : '0'}%</td>
                     </tr>
                 `).join('')}
                 
@@ -189,7 +205,7 @@ class Relatorios {
                         <td>${category}</td>
                         <td>Despesa</td>
                         <td style="color: #dc2626; font-weight: bold;">${this.formatCurrency(amount)}</td>
-                        <td>${((amount / totalExpenses) * 100).toFixed(1)}%</td>
+                        <td>${totalExpenses > 0 ? ((amount / totalExpenses) * 100).toFixed(1) : '0'}%</td>
                     </tr>
                 `).join('')}
                 
@@ -262,8 +278,6 @@ class Relatorios {
     }
 
     exportToPDF() {
-        // Simple PDF export using window.print() for now
-        // In a real application, you might use libraries like jsPDF or html2pdf.js
         window.print();
     }
 
@@ -279,12 +293,12 @@ class Relatorios {
     }
 
     loadData() {
-        // Generate report when page is loaded
         this.generateReport();
     }
 }
 
-// Initialize relatorios when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+// ✅ INICIALIZAÇÃO CORRETA
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📋 Inicializando Relatórios...');
     window.relatorios = new Relatorios();
 });

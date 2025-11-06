@@ -9,7 +9,6 @@ class Despesas {
     }
 
     bindEvents() {
-        // Expense form submission
         document.getElementById('expenseForm')?.addEventListener('submit', (e) => {
             e.preventDefault();
             this.handleExpenseSubmit();
@@ -30,27 +29,8 @@ class Despesas {
         }
 
         const fixedExpenses = expenses.filter(e => e.type === 'fixed');
-        
-        console.log('Despesas fixas encontradas:', fixedExpenses); // Debug
-        
-        container.innerHTML = fixedExpenses.map(expense => `
-            <div class="expense-item" data-id="${expense.id}">
-                <div class="item-info">
-                    <div class="item-description">${expense.description}</div>
-                    <div class="item-category">${expense.category}</div>
-                </div>
-                <div class="item-details">
-                    <div class="item-amount">${this.formatCurrency(expense.amount)}</div>
-                    <div class="item-date">${this.formatDate(expense.date)}</div>
-                </div>
-                <div class="item-actions">
-                    <button class="btn-edit" onclick="despesas.editExpense('${expense.id}')">✏️ Editar</button>
-                    <button class="btn-danger" onclick="despesas.deleteExpense('${expense.id}')">🗑️ Excluir</button>
-                </div>
-            </div>
-        `).join('');
+        console.log('🔧 Despesas fixas para renderizar:', fixedExpenses);
 
-        // Show empty state
         if (fixedExpenses.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
@@ -58,51 +38,69 @@ class Despesas {
                     <button class="btn-primary" onclick="app.openExpenseModal()">+ Adicionar Despesa Fixa</button>
                 </div>
             `;
+        } else {
+            container.innerHTML = fixedExpenses.map(expense => `
+                <div class="expense-item" data-id="${expense.id}">
+                    <div class="item-info">
+                        <div class="item-description">${expense.description}</div>
+                        <div class="item-category">${expense.category}</div>
+                        ${expense.paymentMethod ? `<div class="item-payment">💳 ${this.formatPaymentMethod(expense.paymentMethod)}</div>` : ''}
+                        ${expense.notes ? `<div class="item-notes">📝 ${expense.notes}</div>` : ''}
+                    </div>
+                    <div class="item-details">
+                        <div class="item-amount">${this.formatCurrency(expense.amount)}</div>
+                        <div class="item-date">${this.formatDate(expense.date)}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-edit" onclick="despesas.editExpense('${expense.id}')">✏️ Editar</button>
+                        <button class="btn-danger" onclick="despesas.deleteExpense('${expense.id}')">🗑️ Excluir</button>
+                    </div>
+                </div>
+            `).join('');
         }
     }
 
-    
-renderVariableExpenses(expenses) {
-    const container = document.getElementById('variableExpenseList');
-    const variableExpenses = expenses.filter(e => e.type === 'variable');
-    
-    container.innerHTML = variableExpenses.map(expense => `
-        <div class="expense-item" data-id="${expense.id}">
-            <div class="item-info">
-                <div class="item-description">${expense.description}</div>
-                <div class="item-category">${expense.category}</div>
-                <!-- ⭐⭐ NOVOS CAMPOS NA LISTA ⭐⭐ -->
-                ${expense.local ? `<div class="item-local">🏪 ${expense.local}</div>` : ''}
-                ${expense.paymentMethod ? `<div class="item-payment">💳 ${this.formatPaymentMethod(expense.paymentMethod)}</div>` : ''}
-            </div>
-            <div class="item-details">
-                <div class="item-amount">${this.formatCurrency(expense.amount)}</div>
-                <div class="item-date">${this.formatDate(expense.date)}</div>
-            </div>
-            <div class="item-actions">
-                <button class="btn-edit" onclick="despesas.editExpense('${expense.id}')">✏️ Editar</button>
-                <button class="btn-danger" onclick="despesas.deleteExpense('${expense.id}')">🗑️ Excluir</button>
-            </div>
-        </div>
-    `).join('');
-}
+    renderVariableExpenses(expenses) {
+        const container = document.getElementById('variableExpenseList');
+        if (!container) return;
 
+        const variableExpenses = expenses.filter(e => e.type === 'variable');
+        console.log('🎯 Despesas variáveis para renderizar:', variableExpenses);
 
-formatPaymentMethod(method) {
-    const methods = {
-        'dinheiro': 'Dinheiro',
-        'cartao_credito': 'Cartão Crédito', 
-        'cartao_debito': 'Cartão Débito',
-        'pix': 'PIX',
-        'transferencia': 'Transferência'
-    };
-    return methods[method] || method;
-}
+        if (variableExpenses.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <p>Nenhuma despesa variável cadastrada</p>
+                    <button class="btn-primary" onclick="app.openExpenseModal()">+ Adicionar Despesa Variável</button>
+                </div>
+            `;
+        } else {
+            container.innerHTML = variableExpenses.map(expense => `
+                <div class="expense-item" data-id="${expense.id}">
+                    <div class="item-info">
+                        <div class="item-description">${expense.description}</div>
+                        <div class="item-category">${expense.category}</div>
+                        ${expense.paymentMethod ? `<div class="item-payment">💳 ${this.formatPaymentMethod(expense.paymentMethod)}</div>` : ''}
+                        ${expense.notes ? `<div class="item-notes">📝 ${expense.notes}</div>` : ''}
+                    </div>
+                    <div class="item-details">
+                        <div class="item-amount">${this.formatCurrency(expense.amount)}</div>
+                        <div class="item-date">${this.formatDate(expense.date)}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-edit" onclick="despesas.editExpense('${expense.id}')">✏️ Editar</button>
+                        <button class="btn-danger" onclick="despesas.deleteExpense('${expense.id}')">🗑️ Excluir</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
 
     editExpense(id) {
         const data = Storage.getData();
         const expense = data.expenses.find(e => e.id === id);
         if (expense) {
+            console.log('✏️ Editando despesa:', expense);
             window.app.openExpenseModal(expense);
         }
     }
@@ -119,66 +117,114 @@ formatPaymentMethod(method) {
         }
     }
 
+    // ✅ MÉTODO handleExpenseSubmit CORRIGIDO - MESMO PADRÃO DAS RECEITAS
     handleExpenseSubmit() {
-    try {
-        const expenseId = document.getElementById('expenseId').value;
-        const isEditing = !!expenseId; 
-        
-        
-        const description = document.getElementById('expenseDescription').value.trim();
-        const amount = parseFloat(document.getElementById('expenseAmount').value);
-        const date = document.getElementById('expenseDate').value;
-        const category = document.getElementById('expenseCategory').value.trim();
-        
-        if (!description || !amount || !date || !category) {
-            alert('❌ Por favor, preencha todos os campos obrigatórios.');
-            return;
-        }
-
-        if (amount <= 0) {
-            alert('❌ O valor deve ser maior que zero.');
-            return;
-        }
-
-        const expense = {
-            id: expenseId || Date.now().toString(),
-            description: description,
-            amount: amount,
-            date: date,
-            category: category,
+        try {
+            console.log('📝 Iniciando submit da despesa...');
             
-            type: isEditing ? 
-                this.getOriginalExpenseType(expenseId) : 
-                document.getElementById('expenseType').value,
-          
-            paymentMethod: document.getElementById('expensePaymentMethod').value,
-            local: document.getElementById('expenseLocal').value,
-            notes: document.getElementById('expenseNotes').value
-        };
+            // ✅ DETECÇÃO DE NOVA/EDIÇÃO (igual receitas)
+            const expenseId = document.getElementById('expenseId').value;
+            const isEditing = !!expenseId;
+            
+            // ✅ VALIDAÇÃO SIMPLES - APENAS 4 CAMPOS OBRIGATÓRIOS (igual receitas)
+            const description = document.getElementById('expenseDescription').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const date = document.getElementById('expenseDate').value;
+            const category = document.getElementById('expenseCategory').value.trim();
+            
+            // ✅ VALIDAÇÃO IDÊNTICA ÀS RECEITAS
+            if (!description || !amount || !date || !category) {
+                alert('❌ Por favor, preencha todos os campos obrigatórios (Descrição, Valor, Data e Categoria).');
+                return; // ⭐⭐ PARA A EXECUÇÃO SE HOUVER ERRO
+            }
 
-        if (isEditing) {
-            Storage.updateExpense(expense);
-        } else {
-            Storage.addExpense(expense);
+            if (amount <= 0 || isNaN(amount)) {
+                alert('❌ O valor deve ser maior que zero.');
+                return; // ⭐⭐ PARA A EXECUÇÃO SE HOUVER ERRO
+            }
+
+            // ✅ CAMPOS NÃO OBRIGATÓRIOS (após a validação)
+            const paymentMethod = document.getElementById('expensePaymentMethod').value;
+            const notes = document.getElementById('expenseNotes').value;
+
+            // ✅ DETERMINA TIPO (igual receitas)
+            let type;
+            if (isEditing) {
+                const originalData = Storage.getData();
+                const originalExpense = originalData.expenses.find(e => e.id === expenseId);
+                type = originalExpense ? originalExpense.type : 'fixed';
+            } else {
+                type = document.getElementById('expenseType').value;
+            }
+
+            const expense = {
+                id: expenseId || Date.now().toString(),
+                description: description,
+                amount: amount,
+                date: date,
+                category: category,
+                type: type,
+                paymentMethod: paymentMethod,
+                notes: notes
+            };
+
+            console.log('💾 Salvando despesa:', expense);
+
+            // ✅ SALVA (igual receitas)
+            if (isEditing) {
+                Storage.updateExpense(expense);
+                console.log('✅ Despesa atualizada');
+            } else {
+                Storage.addExpense(expense);
+                console.log('✅ Nova despesa criada');
+            }
+
+            // ✅ FECHA MODAL E RECARREGA (igual receitas)
+            window.app.closeExpenseModal();
+            this.loadData();
+            
+            // ✅ APENAS ESTA MENSAGEM DEVE APARECER (igual receitas)
+            alert(`✅ Despesa ${isEditing ? 'atualizada' : 'cadastrada'} com sucesso!`);
+            
+        } catch (error) {
+            console.error('❌ Erro ao salvar despesa:', error);
+            alert('❌ Erro ao salvar despesa. Verifique os dados.');
         }
+    }
 
-        window.app.closeExpenseModal();
-        this.loadData();
-        
-        
-        alert(`✅ Despesa ${isEditing ? 'atualizada' : 'cadastrada'} com sucesso!`);
-        
-    } catch (error) {
-        console.error('Erro ao salvar despesa:', error);
-        alert('❌ Erro ao salvar despesa. Verifique os dados e tente novamente.');
+    // ✅ MÉTODO AUXILIAR PARA BUSCAR TIPO ORIGINAL
+    getOriginalExpenseType(expenseId) {
+        const data = Storage.getData();
+        const expense = data.expenses.find(e => e.id === expenseId);
+        return expense ? expense.type : 'fixed';
+    }
+
+    // ✅ FORMATAÇÃO FORMA DE PAGAMENTO
+    formatPaymentMethod(method) {
+        const methods = {
+            'dinheiro': 'Dinheiro',
+            'cartao_credito': 'Cartão Crédito', 
+            'cartao_debito': 'Cartão Débito',
+            'pix': 'PIX',
+            'transferencia': 'Transferência'
+        };
+        return methods[method] || method;
+    }
+
+    // ✅ MÉTODOS DE FORMATAÇÃO
+    formatCurrency(value) {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(value);
+    }
+
+    formatDate(dateString) {
+        return new Date(dateString).toLocaleDateString('pt-BR');
     }
 }
 
-
-getOriginalExpenseType(expenseId) {
-    const data = Storage.getData();
-    const expense = data.expenses.find(e => e.id === expenseId);
-    return expense ? expense.type : 'fixed';
-}
-
-}
+// Initialize despesas when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.despesas = new Despesas();
+});

@@ -11,52 +11,56 @@ class Dashboard {
 
     bindEvents() {
         // Period selector
-        document.getElementById('periodSelect')?.addEventListener('change', (e) => {
-            this.loadData();
-        });
-
-        // Revenue form
-        document.getElementById('revenueForm')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleRevenueSubmit();
-        });
-
-        // Expense form
-        document.getElementById('expenseForm')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleExpenseSubmit();
-        });
+        const periodSelect = document.getElementById('periodSelect');
+        if (periodSelect) {
+            periodSelect.addEventListener('change', (e) => {
+                this.loadData();
+            });
+        }
     }
 
     loadData() {
-        const data = Storage.getData();
-        this.updateMetrics(data);
-        this.updateRecentTransactions(data);
-        this.updateCharts(data);
+        console.log('📊 Carregando dados do dashboard...');
+        
+        try {
+            const data = Storage.getData();
+            console.log('📦 Dados carregados:', data);
+            
+            this.updateMetrics(data);
+            this.updateRecentTransactions(data);
+            this.updateCharts(data);
+        } catch (error) {
+            console.error('❌ Erro ao carregar dados:', error);
+        }
     }
 
     updateMetrics(data) {
+        console.log('📈 Atualizando métricas...');
+        
         const totalIncome = data.revenues.reduce((sum, revenue) => sum + revenue.amount, 0);
         const totalExpenses = data.expenses.reduce((sum, expense) => sum + expense.amount, 0);
         const balance = totalIncome - totalExpenses;
 
-        document.getElementById('totalIncome').textContent = this.formatCurrency(totalIncome);
-        document.getElementById('totalExpenses').textContent = this.formatCurrency(totalExpenses);
-        document.getElementById('currentBalance').textContent = this.formatCurrency(balance);
-
-        // Update balance color
+        const incomeElement = document.getElementById('totalIncome');
+        const expensesElement = document.getElementById('totalExpenses');
         const balanceElement = document.getElementById('currentBalance');
-        balanceElement.className = 'metric-value';
-        if (balance >= 0) {
-            balanceElement.classList.add('positive');
-        } else {
-            balanceElement.classList.add('negative');
+
+        if (incomeElement) incomeElement.textContent = this.formatCurrency(totalIncome);
+        if (expensesElement) expensesElement.textContent = this.formatCurrency(totalExpenses);
+        if (balanceElement) {
+            balanceElement.textContent = this.formatCurrency(balance);
+            balanceElement.style.color = balance >= 0 ? '#059669' : '#dc2626';
         }
+
+        console.log('✅ Métricas atualizadas:', { totalIncome, totalExpenses, balance });
     }
 
     updateRecentTransactions(data) {
         const container = document.getElementById('recentTransactions');
-        if (!container) return;
+        if (!container) {
+            console.error('❌ Container recentTransactions não encontrado');
+            return;
+        }
 
         // Combine and sort transactions by date
         const allTransactions = [
@@ -64,20 +68,26 @@ class Dashboard {
             ...data.expenses.map(e => ({ ...e, type: 'expense' }))
         ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
 
-        container.innerHTML = allTransactions.map(transaction => `
-            <div class="transaction-item">
-                <div class="transaction-info">
-                    <div class="transaction-description">${transaction.description}</div>
-                    <div class="transaction-category">${transaction.category}</div>
-                </div>
-                <div class="transaction-details">
-                    <div class="transaction-amount ${transaction.type}">
-                        ${transaction.type === 'income' ? '+' : '-'} ${this.formatCurrency(transaction.amount)}
+        console.log('🔄 Transações recentes:', allTransactions);
+
+        if (allTransactions.length === 0) {
+            container.innerHTML = '<div class="empty-state"><p>Nenhuma transação recente</p></div>';
+        } else {
+            container.innerHTML = allTransactions.map(transaction => `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div class="transaction-description">${transaction.description}</div>
+                        <div class="transaction-category">${transaction.category}</div>
                     </div>
-                    <div class="transaction-date">${this.formatDate(transaction.date)}</div>
+                    <div class="transaction-details">
+                        <div class="transaction-amount ${transaction.type}">
+                            ${transaction.type === 'income' ? '+' : '-'} ${this.formatCurrency(transaction.amount)}
+                        </div>
+                        <div class="transaction-date">${this.formatDate(transaction.date)}</div>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+        }
     }
 
     updateCharts(data) {
@@ -87,7 +97,10 @@ class Dashboard {
 
     updateMonthlyChart(data) {
         const ctx = document.getElementById('monthlyChart')?.getContext('2d');
-        if (!ctx) return;
+        if (!ctx) {
+            console.error('❌ Canvas monthlyChart não encontrado');
+            return;
+        }
 
         // Destroy existing chart
         if (this.charts.monthly) {
@@ -126,13 +139,6 @@ class Dashboard {
                 plugins: {
                     legend: {
                         position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => {
-                                return `${context.dataset.label}: ${this.formatCurrency(context.raw)}`;
-                            }
-                        }
                     }
                 },
                 scales: {
@@ -149,7 +155,10 @@ class Dashboard {
 
     updateCategoryChart(data) {
         const ctx = document.getElementById('categoryChart')?.getContext('2d');
-        if (!ctx) return;
+        if (!ctx) {
+            console.error('❌ Canvas categoryChart não encontrado');
+            return;
+        }
 
         // Destroy existing chart
         if (this.charts.category) {
@@ -179,15 +188,6 @@ class Dashboard {
                 plugins: {
                     legend: {
                         position: 'bottom',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => {
-                                const total = categoryData.amounts.reduce((a, b) => a + b, 0);
-                                const percentage = ((context.raw / total) * 100).toFixed(1);
-                                return `${context.label}: ${this.formatCurrency(context.raw)} (${percentage}%)`;
-                            }
-                        }
                     }
                 }
             }
@@ -251,72 +251,7 @@ class Dashboard {
         };
     }
 
-    handleRevenueSubmit() {
-    try {
-        const formData = new FormData(document.getElementById('revenueForm'));
-        const revenueId = document.getElementById('revenueId').value;
-        
-        const revenue = {
-            id: revenueId || Date.now().toString(),
-            description: document.getElementById('revenueDescription').value,
-            amount: parseFloat(document.getElementById('revenueAmount').value),
-            date: document.getElementById('revenueDate').value,
-            type: document.getElementById('revenueType').value,
-            category: document.getElementById('revenueCategory').value || 'Outros'
-        };
-
-        if (revenueId && revenueId !== '') {
-            Storage.updateRevenue(revenue);
-        } else {
-            Storage.addRevenue(revenue);
-        }
-
-        window.app.closeRevenueModal();
-        this.loadData();
-        
-        // Reload receitas page if active
-        if (typeof window.receitas !== 'undefined' && window.receitas.loadData) {
-            window.receitas.loadData();
-        }
-    } catch (error) {
-        console.error('Erro ao salvar receita:', error);
-        alert('Erro ao salvar receita. Verifique os dados e tente novamente.');
-    }
-}
-
-handleExpenseSubmit() {
-    try {
-        const expenseId = document.getElementById('expenseId').value;
-        
-        const expense = {
-            id: expenseId || Date.now().toString(),
-            description: document.getElementById('expenseDescription').value,
-            amount: parseFloat(document.getElementById('expenseAmount').value),
-            date: document.getElementById('expenseDate').value,
-            type: document.getElementById('expenseType').value,
-            category: document.getElementById('expenseCategory').value
-        };
-
-        if (expenseId && expenseId !== '') {
-            Storage.updateExpense(expense);
-        } else {
-            Storage.addExpense(expense);
-        }
-
-        window.app.closeExpenseModal();
-        this.loadData();
-        
-        // Reload despesas page if active
-        if (typeof window.despesas !== 'undefined' && window.despesas.loadData) {
-            window.despesas.loadData();
-        }
-    } catch (error) {
-        console.error('Erro ao salvar despesa:', error);
-        alert('Erro ao salvar despesa. Verifique os dados e tente novamente.');
-    }
-}
-
-formatCurrency(value) {
+    formatCurrency(value) {
         return new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL'
@@ -328,7 +263,8 @@ formatCurrency(value) {
     }
 }
 
-// Initialize dashboard when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+// ✅ INICIALIZAÇÃO CORRETA DO DASHBOARD
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📊 Inicializando Dashboard...');
     window.dashboard = new Dashboard();
 });
