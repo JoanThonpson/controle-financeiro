@@ -82,7 +82,7 @@ body {
 
 /* === COMPONENTES DE FORMULÁRIO === */
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem; /* ✅ REDUZIDO: Mais compacto */
 }
 
 .form-group label {
@@ -96,7 +96,7 @@ body {
 .form-group select,
 .form-group textarea {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px 10px; /* ✅ REDUZIDO: Campos mais compactos */
     border: 2px solid #d1d5db;
     border-radius: 8px;
     font-size: 1rem;
@@ -118,6 +118,15 @@ body {
     margin-top: 1.5rem;
 }
 
+/* ✅ NOVO: Layout em grid para formulários em telas grandes */
+@media (min-width: 768px) {
+    .form-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+}
+
 /* === COMPONENTES DE MODAL === */
 .modal {
     display: none;
@@ -133,11 +142,13 @@ body {
 
 .modal-content {
     background: white;
-    margin: 5% auto;
-    padding: 2rem;
+    margin: 2% auto; /* ✅ REDUZIDO: Margem menor */
+    padding: 1.5rem; /* ✅ REDUZIDO: Padding menor */
     border-radius: 12px;
     width: 90%;
     max-width: 500px;
+    max-height: 90vh; /* ✅ NOVO: Altura máxima */
+    overflow-y: auto; /* ✅ NOVO: Scroll interno */
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     animation: slideIn 0.3s ease;
 }
@@ -289,5 +300,24 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* ✅ NOVO: Responsividade para mobile */
+@media (max-width: 768px) {
+    .modal-content {
+        margin: 5% auto; /* Mais margem em mobile */
+        padding: 1rem; /* Padding menor em mobile */
+        width: 95%; /* Mais largura em mobile */
+    }
+    
+    .form-actions {
+        flex-direction: column; /* Botões em coluna em mobile */
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        width: 100%; /* Botões full width em mobile */
+        margin-bottom: 0.5rem;
+    }
 }
 /* Fim dos estilos de componentes */
