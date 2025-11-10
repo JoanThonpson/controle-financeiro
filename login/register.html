@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Controle Financeiro</title>
+    <link rel="stylesheet" href="../styles/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <!-- Lado Esquerdo - Imagem -->
+        <div class="login-left">
+            <div class="login-image">
+                <img src="https://cdn.prod.website-files.com/6356cdb912effe30e07f865a/63793c9b16c84d32f9e3c3e7_Finance%20app%20development-pana.png" alt="Controle Financeiro">
+            </div>
+            <div class="login-left-content">
+                <h1>Comece a Controlar</h1>
+                <p>Crie sua conta e tenha total controle sobre suas finanças pessoais</p>
+            </div>
+        </div>
+
+        <!-- Lado Direito - Formulário -->
+        <div class="login-right">
+            <div class="login-form-container">
+                <!-- Header -->
+                <div class="login-header">
+                    <div class="logo">
+                        <h2>💰 Finanças</h2>
+                    </div>
+                    <h1>Criar Conta</h1>
+                    <p>Preencha os dados para se cadastrar</p>
+                </div>
+
+                <!-- Formulário -->
+                <form id="registerForm" class="login-form">
+                    <!-- Nome -->
+                    <div class="form-group">
+                        <label for="name">Nome Completo</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            <input type="text" id="name" class="form-input" placeholder="Seu nome completo" required>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            <input type="email" id="email" class="form-input" placeholder="seu@email.com" required>
+                        </div>
+                    </div>
+
+                    <!-- Senha -->
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                            <input type="password" id="password" class="form-input password-input" placeholder="••••••••" required minlength="6">
+                            <button type="button" class="toggle-password" data-target="password">
+                                <svg class="eye-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="password-strength">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="strengthFill"></div>
+                            </div>
+                            <span class="strength-text" id="strengthText">Senha fraca</span>
+                        </div>
+                    </div>
+
+                    <!-- Confirmar Senha -->
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmar Senha</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                            <input type="password" id="confirmPassword" class="form-input password-input" placeholder="••••••••" required>
+                            <button type="button" class="toggle-password" data-target="confirmPassword">
+                                <svg class="eye-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="error-message" id="passwordMatchError"></div>
+                    </div>
+
+                    <!-- Termos -->
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="terms" required>
+                            <span>Eu concordo com os <a href="#" class="terms-link">Termos de Serviço</a> e <a href="#" class="terms-link">Política de Privacidade</a></span>
+                        </label>
+                    </div>
+
+                    <!-- Botão Cadastrar -->
+                    <button type="submit" class="btn-login">Criar Conta</button>
+                </form>
+
+                <!-- Link Login -->
+                <div class="login-footer">
+                    <p>Já tem uma conta? <a href="login.html" class="signup-link">Fazer Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../scripts/auth.js"></script>
+    <script>
+        // Toggle Password Visibility para múltiplos campos
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                const eyeIcon = this.querySelector('.eye-icon');
+                
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Alternar ícone
+                if (type === 'text') {
+                    eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>';
+                } else {
+                    eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+                }
+            });
+        });
+
+        // Verificar força da senha
+        const passwordInput = document.getElementById('password');
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            const strength = calculatePasswordStrength(password);
+            
+            strengthFill.style.width = strength.percentage + '%';
+            strengthFill.className = 'strength-fill ' + strength.class;
+            strengthText.textContent = strength.text;
+            strengthText.className = 'strength-text ' + strength.class;
+        });
+
+        function calculatePasswordStrength(password) {
+            let score = 0;
+            
+            if (password.length >= 8) score++;
+            if (password.match(/[a-z]/)) score++;
+            if (password.match(/[A-Z]/)) score++;
+            if (password.match(/[0-9]/)) score++;
+            if (password.match(/[^a-zA-Z0-9]/)) score++;
+            
+            const strengthMap = [
+                { percentage: 20, class: 'weak', text: 'Senha fraca' },
+                { percentage: 40, class: 'weak', text: 'Senha fraca' },
+                { percentage: 60, class: 'medium', text: 'Senha média' },
+                { percentage: 80, class: 'strong', text: 'Senha forte' },
+                { percentage: 100, class: 'very-strong', text: 'Senha muito forte' }
+            ];
+            
+            return strengthMap[Math.min(score, strengthMap.length - 1)];
+        }
+
+        // Verificar se senhas coincidem
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const passwordMatchError = document.getElementById('passwordMatchError');
+
+        confirmPasswordInput.addEventListener('input', function() {
+            const password = passwordInput.value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                passwordMatchError.textContent = 'As senhas não coincidem';
+                passwordMatchError.classList.add('show');
+            } else {
+                passwordMatchError.classList.remove('show');
+            }
+        });
+
+        // Form Submit
+        const registerForm = document.getElementById('registerForm');
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const terms = document.getElementById('terms').checked;
+            
+            // Validações
+            if (password !== confirmPassword) {
+                alert('As senhas não coincidem!');
+                return;
+            }
+            
+            if (!terms) {
+                alert('Você deve aceitar os termos de serviço!');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('A senha deve ter pelo menos 6 caracteres!');
+                return;
+            }
+
+            // Usar a função do auth.js
+            if (window.Auth && typeof window.Auth.register === 'function') {
+                const result = window.Auth.register({
+                    name: name,
+                    email: email,
+                    password: password
+                });
+                
+                if (result.success) {
+                    alert('Conta criada com sucesso! Faça login para continuar.');
+                    window.location.href = 'login.html';
+                } else {
+                    alert(result.message);
+                }
+            } else {
+                console.error('Sistema de autenticação não carregado');
+                alert('Erro: Sistema de autenticação não disponível');
+            }
+        });
+    </script>
+
+    <style>
+        /* Estilos adicionais para registro */
+        .password-strength {
+            margin-top: 8px;
+        }
+        
+        .strength-bar {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+        
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .strength-fill.weak {
+            background: #dc2626;
+        }
+        
+        .strength-fill.medium {
+            background: #d97706;
+        }
+        
+        .strength-fill.strong {
+            background: #059669;
+        }
+        
+        .strength-fill.very-strong {
+            background: #065f46;
+        }
+        
+        .strength-text {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .strength-text.weak {
+            color: #dc2626;
+        }
+        
+        .strength-text.medium {
+            color: #d97706;
+        }
+        
+        .strength-text.strong {
+            color: #059669;
+        }
+        
+        .strength-text.very-strong {
+            color: #065f46;
+        }
+        
+        .terms-link {
+            color: #059669;
+            text-decoration: none;
+        }
+        
+        .terms-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</body>
+</html>

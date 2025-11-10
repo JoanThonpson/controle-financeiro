@@ -9,11 +9,40 @@
     <link rel="stylesheet" href="styles/components.css">
 </head>
 <body>
+    <!-- ✅ ADICIONADO: Verificação de login -->
+    <script src="scripts/auth.js"></script>
+    <script>
+        // Verificação imediata de login
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.Auth || !window.Auth.isLoggedIn()) {
+                window.location.href = 'login/index.html';
+                return;
+            }
+            
+            // Carregar dados do usuário logado
+            const userData = window.Auth.getUserFinancialData();
+            if (userData) {
+                // Migrar dados do localStorage global para o usuário atual se necessário
+                const globalData = localStorage.getItem('financialData');
+                if (!globalData && userData) {
+                    localStorage.setItem('financialData', JSON.stringify(userData));
+                }
+            }
+            
+            console.log('Usuário logado:', window.Auth.getCurrentUser());
+        });
+    </script>
+
     <div class="app-container">
         <!-- Sidebar -->
         <nav class="sidebar">
             <div class="logo">
                 <h2>💰 Finanças</h2>
+                <!-- ✅ ADICIONADO: Informações do usuário -->
+                <div class="user-info">
+                    <span id="userEmail" class="user-email"></span>
+                    <button onclick="logout()" class="btn-logout">Sair</button>
+                </div>
             </div>
             <ul class="nav-links">
                 <li><a href="#" class="nav-link active" data-page="dashboard">📊 Dashboard</a></li>
@@ -313,5 +342,23 @@
     <script src="data/storage.js"></script>
     <script src="scripts/futuras.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    <!-- ✅ ADICIONADO: Informações do usuário e logout -->
+    <script>
+        // Adicionar informações do usuário na sidebar
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = window.Auth?.getCurrentUser();
+            if (user && document.getElementById('userEmail')) {
+                document.getElementById('userEmail').textContent = user.email;
+            }
+        });
+        
+        // Função de logout global
+        window.logout = function() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                window.Auth.logout();
+            }
+        };
+    </script>
 </body>
 </html>

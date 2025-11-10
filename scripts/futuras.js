@@ -17,23 +17,24 @@ class Futuras {
             });
         }
 
-        // ✅ CORREÇÃO CRÍTICA: Configurar o event listener do formulário
-        this.setupFormHandler();
+        // ✅ CORREÇÃO: NÃO usar setupFormHandler() no bindEvents
+        // Vamos configurar o handler apenas quando o modal for aberto
     }
 
-    // ✅ NOVO MÉTODO: Configurar o handler do formulário para despesas futuras
+    // ✅ CORREÇÃO: Método simplificado - apenas adiciona listener sem clonar
     setupFormHandler() {
         const expenseForm = document.getElementById('expenseForm');
         if (expenseForm) {
-            // Remover listeners antigos para evitar duplicação
-            const newExpenseForm = expenseForm.cloneNode(true);
-            expenseForm.parentNode.replaceChild(newExpenseForm, expenseForm);
+            // ✅ CORREÇÃO: Não clonar o form, apenas adicionar listener
+            // Remover qualquer listener anterior específico do futuras
+            expenseForm.removeEventListener('submit', this.futureExpenseHandler);
             
-            // Adicionar listener específico para despesas futuras
-            newExpenseForm.addEventListener('submit', (e) => {
+            // Adicionar novo listener
+            this.futureExpenseHandler = (e) => {
                 e.preventDefault();
                 this.handleFutureExpenseSubmit();
-            });
+            };
+            expenseForm.addEventListener('submit', this.futureExpenseHandler);
         }
     }
 
@@ -89,7 +90,7 @@ class Futuras {
         
         if (!modal || !title || !form) return;
 
-        // ✅ CORREÇÃO: Configurar o handler ANTES de abrir o modal
+        // ✅ CORREÇÃO: Configurar o handler apenas quando abrir o modal
         this.setupFormHandler();
 
         if (editData) {
