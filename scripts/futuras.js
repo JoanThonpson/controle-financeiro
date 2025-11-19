@@ -17,24 +17,31 @@ class Futuras {
             });
         }
 
-        // ✅ CORREÇÃO: NÃO usar setupFormHandler() no bindEvents
-        // Vamos configurar o handler apenas quando o modal for aberto
+        // ✅ CORREÇÃO CRÍTICA: Configurar o event listener do formulário
+        this.setupFormHandler();
     }
 
-    // ✅ CORREÇÃO: Método simplificado - apenas adiciona listener sem clonar
+    // ✅ MÉTODO: Configurar o handler do formulário para despesas futuras
     setupFormHandler() {
         const expenseForm = document.getElementById('expenseForm');
         if (expenseForm) {
-            // ✅ CORREÇÃO: Não clonar o form, apenas adicionar listener
-            // Remover qualquer listener anterior específico do futuras
-            expenseForm.removeEventListener('submit', this.futureExpenseHandler);
+            // Remover listeners antigos para evitar duplicação
+            const newExpenseForm = expenseForm.cloneNode(true);
+            expenseForm.parentNode.replaceChild(newExpenseForm, expenseForm);
             
-            // Adicionar novo listener
-            this.futureExpenseHandler = (e) => {
+            // ✅ CORREÇÃO: RESTAURAR o event listener do botão Cancelar
+            const cancelBtn = document.getElementById('cancelExpenseBtn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    window.app.closeExpenseModal();
+                });
+            }
+            
+            // Adicionar listener específico para despesas futuras
+            newExpenseForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 this.handleFutureExpenseSubmit();
-            };
-            expenseForm.addEventListener('submit', this.futureExpenseHandler);
+            });
         }
     }
 
@@ -90,7 +97,7 @@ class Futuras {
         
         if (!modal || !title || !form) return;
 
-        // ✅ CORREÇÃO: Configurar o handler apenas quando abrir o modal
+        // Configurar o handler ANTES de abrir o modal
         this.setupFormHandler();
 
         if (editData) {
