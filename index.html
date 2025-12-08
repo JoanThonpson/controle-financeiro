@@ -15,22 +15,13 @@
         // Verificação imediata de login
         document.addEventListener('DOMContentLoaded', function() {
             if (!window.Auth || !window.Auth.isLoggedIn()) {
-                window.location.href = 'login/index.html';
+                window.location.href = 'login/login.html';
                 return;
             }
             
             // Carregar dados do usuário logado
-            const userData = window.Auth.getUserFinancialData();
-            if (userData) {
-                // Migrar dados do localStorage global para o usuário atual se necessário
-                const globalData = localStorage.getItem('financialData');
-                if (!globalData && userData) {
-                    localStorage.setItem('financialData', JSON.stringify(userData));
-                }
-            }
-            
-            console.log('Usuário logado:', window.Auth.getCurrentUser());
-        });
+      
+        })
     </script>
 
     <div class="app-container">
@@ -359,6 +350,7 @@
                 window.Auth.logout();
             }
         };
+            
     </script>
 </body>
 </html>

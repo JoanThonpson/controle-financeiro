@@ -5,6 +5,7 @@ class Despesas {
 
     init() {
         this.bindEvents();
+        this.setupFormControl();
         this.loadData();
     }
 
@@ -13,6 +14,29 @@ class Despesas {
             e.preventDefault();
             this.handleExpenseSubmit();
         });
+    }
+
+    setupFormControl() {
+        const expenseForm = document.getElementById('expenseForm');
+        if (expenseForm) {
+            // Clonar formulário para limpar listeners
+            const newForm = expenseForm.cloneNode(true);
+            expenseForm.parentNode.replaceChild(newForm, expenseForm);
+            
+            // Adicionar nosso listener para despesas normais
+            newForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleExpenseSubmit();
+            });
+            
+            // Manter botão cancelar funcionando
+            const cancelBtn = document.getElementById('cancelExpenseBtn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    window.app.closeExpenseModal();
+                });
+            }
+        }
     }
 
     loadData() {
@@ -201,9 +225,23 @@ class Despesas {
     formatDate(dateString) {
         return new Date(dateString).toLocaleDateString('pt-BR');
     }
+
+    setupExpenseFormHandler() {
+        const expenseForm = document.getElementById('expenseForm');
+        if (expenseForm) {
+            // Remover listeners antigos para evitar duplicação
+            const newForm = expenseForm.cloneNode(true);
+            expenseForm.parentNode.replaceChild(newForm, expenseForm);
+            
+            // Adicionar nosso listener
+            newForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleExpenseSubmit();
+            });
+        }
+    }
 }
 
-// ✅ CORREÇÃO SIMPLES: Voltar à inicialização original
 document.addEventListener('DOMContentLoaded', () => {
     window.despesas = new Despesas();
 });

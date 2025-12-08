@@ -62,12 +62,14 @@ class Auth {
                 password: userData.password, // Em produção, usar hash!
                 name: userData.name || '',
                 createdAt: new Date().toISOString(),
-                financialData: {
-                    revenues: [],
-                    expenses: [],
-                    futureExpenses: []
-                }
+               
             };
+
+            this.saveUserFinancialData({ // Método da classe Auth
+                revenues: [],
+                expenses: [],
+                futureExpenses: []
+            }); 
 
             users.push(newUser);
             this.saveUsers(users);

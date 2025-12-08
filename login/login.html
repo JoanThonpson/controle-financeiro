@@ -109,9 +109,22 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
+            if (!email || !password) {
+                alert('Por favor, preencha email e senha.');
+                return;
+            }
+
             // Usar a função do auth.js
             if (window.Auth && typeof window.Auth.login === 'function') {
-                window.Auth.login(email, password);
+                const result = window.Auth.login(email, password);
+
+                if (result && !result.success) {
+            alert(result.message || 'Erro ao fazer login');
+            return;
+                }
+
+                // Redirecionar para a página principal após login bem-sucedido
+                window.location.href = '../index.html';
             } else {
                 console.error('Sistema de autenticação não carregado');
                 alert('Erro: Sistema de autenticação não disponível');

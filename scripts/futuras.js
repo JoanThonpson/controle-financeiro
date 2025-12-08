@@ -16,33 +16,6 @@ class Futuras {
                 this.openFutureExpenseModal();
             });
         }
-
-        // ✅ CORREÇÃO CRÍTICA: Configurar o event listener do formulário
-        this.setupFormHandler();
-    }
-
-    // ✅ MÉTODO: Configurar o handler do formulário para despesas futuras
-    setupFormHandler() {
-        const expenseForm = document.getElementById('expenseForm');
-        if (expenseForm) {
-            // Remover listeners antigos para evitar duplicação
-            const newExpenseForm = expenseForm.cloneNode(true);
-            expenseForm.parentNode.replaceChild(newExpenseForm, expenseForm);
-            
-            // ✅ CORREÇÃO: RESTAURAR o event listener do botão Cancelar
-            const cancelBtn = document.getElementById('cancelExpenseBtn');
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', () => {
-                    window.app.closeExpenseModal();
-                });
-            }
-            
-            // Adicionar listener específico para despesas futuras
-            newExpenseForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleFutureExpenseSubmit();
-            });
-        }
     }
 
     loadData() {
@@ -97,8 +70,8 @@ class Futuras {
         
         if (!modal || !title || !form) return;
 
-        // Configurar o handler ANTES de abrir o modal
-        this.setupFormHandler();
+        // ❌❌❌ NÃO CHAMAR setupFormHandler() ❌❌❌
+        // REMOVER COMPLETAMENTE: this.setupFormHandler();
 
         if (editData) {
             title.textContent = 'Editar Despesa Futura';
@@ -120,6 +93,33 @@ class Futuras {
         }
 
         modal.style.display = 'block';
+        
+        // ✅ TEMPORARIAMENTE substituir o handler apenas para esta sessão do modal
+        this.setupTemporaryHandler(editData ? 'edit' : 'new');
+    }
+
+    // ✅ NOVO: Handler temporário apenas para esta instância do modal
+    setupTemporaryHandler(mode) {
+        const form = document.getElementById('expenseForm');
+        if (!form) return;
+        
+        // Clonar o formulário para limpar listeners antigos
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        
+        // Adicionar listener específico para despesas futuras
+        newForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleFutureExpenseSubmit(mode);
+        });
+        
+        // Manter botão cancelar funcionando
+        const cancelBtn = document.getElementById('cancelExpenseBtn');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                window.app.closeExpenseModal();
+            });
+        }
     }
 
     fillFutureExpenseForm(data) {
@@ -140,7 +140,7 @@ class Futuras {
         }
     }
 
-    handleFutureExpenseSubmit() {
+    handleFutureExpenseSubmit(mode) {
         try {
             console.log('💾 Salvando despesa FUTURA...');
             
