@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Controle Financeiro</title>
-    <link rel="stylesheet" href="../styles/login.css">
+    <link rel="stylesheet" href="login.css">
 </head>
 <body>
     <div class="login-container">
         <!-- Lado Esquerdo - Imagem -->
         <div class="login-left">
             <div class="login-image">
-                <img src="https://vetus.com.br/universidade/wp-content/uploads/2019/01/financeiro.jpg" alt="Controle Financeiro">
+                <img src="assets/financeiro.jpg" alt="Controle Financeiro">
             </div>
             <div class="login-left-content">
                 <h1>Controle suas Finanças</h1>
@@ -82,7 +82,7 @@
         </div>
     </div>
 
-    <script src="../scripts/auth.js"></script>
+    <script src="scripts/auth.js"></script>
     <script>
         // Toggle Password Visibility
         const togglePassword = document.getElementById('togglePassword');
@@ -124,7 +124,7 @@
                 }
 
                 // Redirecionar para a página principal após login bem-sucedido
-                window.location.href = '../index.html';
+                window.location.href = 'index.html';
             } else {
                 console.error('Sistema de autenticação não carregado');
                 alert('Erro: Sistema de autenticação não disponível');

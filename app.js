@@ -121,6 +121,27 @@ class App {
         } else {
             console.log('✅ Dados existentes encontrados');
         }
+
+         // Se não tem usuário logado, não inicializa dados
+    if (!currentUserStr) {
+        console.log('⚠️ Nenhum usuário logado');
+        return;
+    }
+    
+    try {
+        const currentUser = JSON.parse(currentUserStr);
+        const userDataKey = `financialData_${currentUser.id}`;
+        const userData = localStorage.getItem(userDataKey);
+        
+        if (!userData) {
+            console.log('🆕 Criando dados vazios para novo usuário');
+            this.initializeEmptyDataForUser(currentUser.id);
+        }
+    } catch (error) {
+        console.error('❌ Erro na inicialização:', error);
+        // Recria dados se estiverem corrompidos
+        this.repairCorruptedData();
+    }
     }
 
     initializeSampleData() {

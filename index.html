@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle Financeiro Pessoal</title>
-    <link rel="stylesheet" href="styles/style.css">
-    <link rel="stylesheet" href="styles/dashboard.css">
-    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="components.css">
 </head>
 <body>
     <!-- ✅ ADICIONADO: Verificação de login -->
@@ -15,7 +15,7 @@
         // Verificação imediata de login
         document.addEventListener('DOMContentLoaded', function() {
             if (!window.Auth || !window.Auth.isLoggedIn()) {
-                window.location.href = 'login/login.html';
+                window.location.href = 'login.html';
                 return;
             }
             
@@ -324,15 +324,14 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     <script src="chart.min.js"></script>
     <script src="scripts/app.js"></script>
     <script src="scripts/dashboard.js"></script>
+    <script src="scripts/relatorios.js"></script>
     <script src="scripts/receitas.js"></script>
     <script src="scripts/despesas.js"></script>
-    <script src="scripts/relatorios.js"></script>
     <script src="data/storage.js"></script>
     <script src="scripts/futuras.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
     <!-- ✅ ADICIONADO: Informações do usuário e logout -->
     <script>

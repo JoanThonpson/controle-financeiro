@@ -103,7 +103,7 @@ class Auth {
                 localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
                 
                 // Redirecionar para o app
-                window.location.href = '../index.html';
+                window.location.href = 'index.html';
                 
                 return {
                     success: true,
@@ -131,7 +131,7 @@ class Auth {
         localStorage.removeItem('currentUser');
         
         // Redirecionar para login
-        window.location.href = 'login/login.html';
+        window.location.href = 'login.html';
     }
 
     // Verificar se usuário está logado
@@ -207,13 +207,13 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.pathname.endsWith('/')) {
         
         if (!auth.isLoggedIn()) {
-            window.location.href = 'login/login.html';
+            window.location.href = 'login.html';
         }
     }
     
     // Se estiver na página de login e já estiver logado, redirecionar para app
     if (window.location.pathname.includes('login.html') && auth.isLoggedIn()) {
-        window.location.href = '../index.html';
+        window.location.href = 'index.html';
     }
 });
 
