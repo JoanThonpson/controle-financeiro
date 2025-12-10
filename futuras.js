@@ -117,7 +117,7 @@ class Futuras {
         const cancelBtn = document.getElementById('cancelExpenseBtn');
         if (cancelBtn) {
             cancelBtn.addEventListener('click', () => {
-                window.app.closeExpenseModal();
+                document.getElementById('expenseModal').style.display = 'none';
             });
         }
     }
@@ -174,7 +174,8 @@ class Futuras {
                 console.log('✅ Nova despesa futura criada');
             }
 
-            window.app.closeExpenseModal();
+            document.getElementById('expenseModal').style.display = 'none';
+
             this.loadData();
             
             // ✅ ATUALIZAR DASHBOARD também

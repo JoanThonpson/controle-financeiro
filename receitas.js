@@ -56,7 +56,7 @@ class Receitas {
             container.innerHTML = `
                 <div class="empty-state">
                     <p>Nenhuma receita fixa cadastrada</p>
-                    <button class="btn-primary" onclick="app.openRevenueModal()">+ Adicionar Receita Fixa</button>
+                    <button class="btn-primary" onclick="receitas.abrirNovaReceita()">+ Adicionar Receita Fixa</button>
                 </div>
             `;
         }
@@ -96,7 +96,7 @@ class Receitas {
             container.innerHTML = `
                 <div class="empty-state">
                     <p>Nenhuma receita variável cadastrada</p>
-                    <button class="btn-primary" onclick="app.openRevenueModal()">+ Adicionar Receita Variável</button>
+                    <button class="btn-primary" onclick="receitas.abrirNovaReceita()">+ Adicionar Receita Variável</button>
                 </div>
             `;
         }
@@ -106,8 +106,42 @@ class Receitas {
         const data = Storage.getData();
         const revenue = data.revenues.find(r => r.id === id);
         if (revenue) {
-            window.app.openRevenueModal(revenue);
+            this.abrirModalEdicao(revenue);
         }
+    }
+
+    abrirModalEdicao(revenue) {
+        const modal = document.getElementById('revenueModal');
+        const title = document.getElementById('revenueModalTitle');
+        const form = document.getElementById('revenueForm');
+
+        title.textContent = 'Editar Receita';
+
+        // Preencher formulário
+        document.getElementById('revenueId').value = revenue.id;
+        document.getElementById('revenueDescription').value = revenue.description;
+        document.getElementById('revenueAmount').value = revenue.amount;
+        document.getElementById('revenueDate').value = revenue.date;
+        document.getElementById('revenueType').value = revenue.type;
+        document.getElementById('revenueCategory').value = revenue.category;
+        document.getElementById('revenueNotes').value = revenue.notes || '';
+
+        // Ocultar campo tipo na edição
+        document.getElementById('revenueTypeGroup').style.display = 'none';
+
+        modal.style.display = 'block';
+    }
+
+    abrirNovaReceita() {
+    const modal = document.getElementById('revenueModal');
+    const title = document.getElementById('revenueModalTitle');
+    const form = document.getElementById('revenueForm');
+    
+    title.textContent = 'Nova Receita';
+    form.reset();
+    document.getElementById('revenueId').value = '';
+    document.getElementById('revenueTypeGroup').style.display = 'block';
+    modal.style.display = 'block';
     }
 
     deleteRevenue(id) {
@@ -167,7 +201,7 @@ class Receitas {
                 Storage.addRevenue(revenue);
             }
 
-            window.app.closeRevenueModal();
+            document.getElementById('revenueModal').style.display = 'none';
             this.loadData();
             
             // Update dashboard if active

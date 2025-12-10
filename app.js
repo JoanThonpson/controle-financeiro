@@ -332,5 +332,26 @@ class App {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('=== 🚀 SISTEMA INICIANDO ===');
     window.app = new App();
+    
+    // ✅ ADICIONAR funções globais
+    window.closeRevenueModal = () => {
+        document.getElementById('revenueModal').style.display = 'none';
+        document.getElementById('revenueForm').reset();
+    };
+    
+    window.closeExpenseModal = () => {
+        document.getElementById('expenseModal').style.display = 'none';
+        document.getElementById('expenseForm').reset();
+    };
+    
+    window.openRevenueModal = (data) => {
+        window.app.openRevenueModal(data);
+    };
+    
+    window.openExpenseModal = (data) => {
+        window.app.openExpenseModal(data);
+    };
+    
     console.log('=== ✅ SISTEMA INICIADO ===');
+    
 });

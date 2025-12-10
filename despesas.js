@@ -33,7 +33,7 @@ class Despesas {
             const cancelBtn = document.getElementById('cancelExpenseBtn');
             if (cancelBtn) {
                 cancelBtn.addEventListener('click', () => {
-                    window.app.closeExpenseModal();
+                    document.getElementById('expenseModal').style.display = 'none';
                 });
             }
         }
@@ -60,7 +60,7 @@ class Despesas {
             container.innerHTML = `
                 <div class="empty-state">
                     <p>Nenhuma despesa fixa cadastrada</p>
-                    <button class="btn-primary" onclick="app.openExpenseModal()">+ Adicionar Despesa Fixa</button>
+                    <button class="btn-primary" onclick="despesas.abrirNovaDespesa()">+ Adicionar Despesa Fixa</button>
                 </div>
             `;
         } else {
@@ -95,8 +95,7 @@ class Despesas {
             container.innerHTML = `
                 <div class="empty-state">
                     <p>Nenhuma despesa variável cadastrada</p>
-                    <button class="btn-primary" onclick="app.openExpenseModal()">+ Adicionar Despesa Variável</button>
-                </div>
+                    <button class="btn-primary" onclick="despesas.abrirNovaDespesa()">+ Adicionar Despesa Variável</button>                </div>
             `;
         } else {
             container.innerHTML = variableExpenses.map(expense => `
@@ -124,9 +123,44 @@ class Despesas {
         const data = Storage.getData();
         const expense = data.expenses.find(e => e.id === id && !e.isFuture);
         if (expense) {
-            window.app.openExpenseModal(expense);
+            this.abrirModalEdicao(expense);
         }
     }
+
+    abrirModalEdicao(expense) {
+        const modal = document.getElementById('expenseModal');
+        const title = document.getElementById('expenseModalTitle');
+        const form = document.getElementById('expenseForm');
+
+        title.textContent = 'Editar Despesa';
+
+        // Preencher formulário
+        document.getElementById('expenseId').value = expense.id;
+        document.getElementById('expenseDescription').value = expense.description;
+        document.getElementById('expenseAmount').value = expense.amount;
+        document.getElementById('expenseDate').value = expense.date;
+        document.getElementById('expenseType').value = expense.type;
+        document.getElementById('expenseCategory').value = expense.category;
+        document.getElementById('expensePaymentMethod').value = expense.paymentMethod || 'dinheiro';
+        document.getElementById('expenseNotes').value = expense.notes || '';
+
+        // Ocultar campo tipo na edição
+        document.getElementById('expenseTypeGroup').style.display = 'none';
+
+        modal.style.display = 'block';
+    }
+    
+    abrirNovaDespesa() {
+        const modal = document.getElementById('expenseModal');
+        const title = document.getElementById('expenseModalTitle');
+        const form = document.getElementById('expenseForm');
+    
+        title.textContent = 'Nova Despesa';
+        form.reset();
+        document.getElementById('expenseId').value = '';
+        document.getElementById('expenseTypeGroup').style.display = 'block';
+        modal.style.display = 'block';
+ }
 
     deleteExpense(id) {
         if (confirm('Tem certeza que deseja excluir esta despesa?')) {
@@ -189,7 +223,7 @@ class Despesas {
                 Storage.addExpense(expense);
             }
 
-            window.app.closeExpenseModal();
+            document.getElementById('expenseModal').style.display = 'none';
             this.loadData();
             
             if (window.dashboard && window.dashboard.loadData) {
