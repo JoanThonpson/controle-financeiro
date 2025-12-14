@@ -82,6 +82,8 @@ Navegue até a pasta e abra o arquivo index.html no seu navegador.
 
 Pronto!
 Todos os dados são salvos automaticamente no seu navegador.
+
+ou  Aceese este link e navegue https://joanthonpson.github.io/controle-financeiro/login.html
 --------------------------------------------------------------------
 
 👨‍🎓 Sobre o Autor
