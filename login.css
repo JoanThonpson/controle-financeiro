@@ -364,3 +364,18 @@ body {
 .error-message.show {
     display: block;
 }
+
+.linkedin-icon {
+    font-size: 14px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.linkedin-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.linkedin-link:hover .linkedin-icon {
+    color: #0a66c2;
+}
