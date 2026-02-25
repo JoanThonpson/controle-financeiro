@@ -1,4 +1,4 @@
-// Navegação entre páginas - CORRIGIDO
+// Navegação entre páginas
 class App {
     constructor() {
         this.currentPage = 'dashboard';
@@ -110,19 +110,42 @@ class App {
         });
     }
 
-    // ✅ INICIALIZAÇÃO DE DADOS CORRIGIDA
+        // INICIALIZAÇÃO DE DADOS - 
     initializeData() {
         console.log('📊 Verificando dados...');
-        const existingData = localStorage.getItem('financialData');
+
+        // 1. Pega usuário logado de forma segura
+        const currentUserStr = localStorage.getItem('currentUser');
         
-        if (!existingData) {
-            console.log('🆕 Criando dados de exemplo...');
-            this.initializeSampleData();
-        } else {
-            console.log('✅ Dados existentes encontrados');
+        if (!currentUserStr) {
+            console.warn('⚠️ Nenhum usuário logado - pulando inicialização de dados');
+            return;
+        }
+
+        try {
+            const currentUser = JSON.parse(currentUserStr);
+            const userDataKey = `financialData_${currentUser.id}`;
+            const userData = localStorage.getItem(userDataKey);
+
+            if (!userData) {
+                console.log('🆕 Criando dados vazios para novo usuário:', currentUser.email);
+                this.initializeEmptyDataForUser(currentUser.id);
+            } else {
+                console.log('✅ Dados do usuário carregados:', currentUser.email);
+            }
+        } catch (error) {
+            console.error('❌ Erro ao ler dados do usuário:', error);
+            // Limpa dados corrompidos
+            localStorage.removeItem('currentUser');
         }
     }
 
+    // Método auxiliar (já existia no seu código antigo, só garantindo que esteja aqui)
+    initializeEmptyDataForUser(userId) {
+        const emptyData = { revenues: [], expenses: [], futureExpenses: [] };
+        const userDataKey = `financialData_${userId}`;
+        localStorage.setItem(userDataKey, JSON.stringify(emptyData));
+    }
     initializeSampleData() {
         const sampleData = {
             revenues: [
