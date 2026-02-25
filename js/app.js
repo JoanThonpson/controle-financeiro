@@ -5,11 +5,14 @@ class App {
         this.init();
     }
 
-    init() {
-        console.log('🚀 Iniciando aplicação...');
-        this.bindEvents();
+  init() {
+    console.log('🔗 Iniciando App...');
+    this.bindEvents();
+    
+    // Espera um pouquinho para garantir que outros scripts criaram window.dashboard etc.
+    setTimeout(() => {
         this.initializeData();
-        this.loadPageData('dashboard');
+    }, 300);  // ou 100–500ms
     }
 
     bindEvents() {
@@ -110,38 +113,41 @@ class App {
         });
     }
 
-    // ✅ INICIALIZAÇÃO DE DADOS CORRIGIDA
+       // INICIALIZAÇÃO DE DADOS 
     initializeData() {
         console.log('📊 Verificando dados...');
-        const existingData = localStorage.getItem('financialData');
+
+        // 1. Pega usuário logado de forma segura
+        const currentUserStr = localStorage.getItem('currentUser');
         
-        if (!existingData) {
-            console.log('🆕 Criando dados de exemplo...');
-            this.initializeSampleData();
-        } else {
-            console.log('✅ Dados existentes encontrados');
+        if (!currentUserStr) {
+            console.warn('⚠️ Nenhum usuário logado - pulando inicialização de dados');
+            return;
         }
 
-         // Se não tem usuário logado, não inicializa dados
-    if (!currentUserStr) {
-        console.log('⚠️ Nenhum usuário logado');
-        return;
-    }
-    
-    try {
-        const currentUser = JSON.parse(currentUserStr);
-        const userDataKey = `financialData_${currentUser.id}`;
-        const userData = localStorage.getItem(userDataKey);
-        
-        if (!userData) {
-            console.log('🆕 Criando dados vazios para novo usuário');
-            this.initializeEmptyDataForUser(currentUser.id);
+        try {
+            const currentUser = JSON.parse(currentUserStr);
+            const userDataKey = `financialData_${currentUser.id}`;
+            const userData = localStorage.getItem(userDataKey);
+
+            if (!userData) {
+                console.log('🆕 Criando dados vazios para novo usuário:', currentUser.email);
+                this.initializeEmptyDataForUser(currentUser.id);
+            } else {
+                console.log('✅ Dados do usuário carregados:', currentUser.email);
+            }
+        } catch (error) {
+            console.error('❌ Erro ao ler dados do usuário:', error);
+            // Limpa dados corrompidos
+            localStorage.removeItem('currentUser');
         }
-    } catch (error) {
-        console.error('❌ Erro na inicialização:', error);
-        // Recria dados se estiverem corrompidos
-        this.repairCorruptedData();
     }
+
+    // Método auxiliar para criar estrutura de dados vazia para um novo usuário
+    initializeEmptyDataForUser(userId) {
+        const emptyData = { revenues: [], expenses: [], futureExpenses: [] };
+        const userDataKey = `financialData_${userId}`;
+        localStorage.setItem(userDataKey, JSON.stringify(emptyData));
     }
 
     initializeSampleData() {
@@ -196,7 +202,7 @@ class App {
         console.log('📦 Dados:', sampleData);
     }
 
-    // ✅ MODAIS CORRIGIDOS
+    // ✅ MODAIS 
     openRevenueModal(editData = null) {
         const modal = document.getElementById('revenueModal');
         const title = document.getElementById('revenueModalTitle');
